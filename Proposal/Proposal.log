@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.24)  28 SEP 2024 23:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.9.24)  30 SEP 2024 17:43
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -501,41 +501,58 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 
 [3]
 
-[4{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
-<images/image1.png, id=24, 341.275pt x 351.3125pt>
+[4]
+<images/image3.png, id=23, 994.71625pt x 395.4775pt>
+File: images/image3.png Graphic file (type png)
+<use images/image3.png>
+Package pdftex.def Info: images/image3.png  used on input line 86.
+(pdftex.def)             Requested size: 345.0pt x 137.16402pt.
+<images/image2.png, id=25, 845.1575pt x 387.4475pt>
+File: images/image2.png Graphic file (type png)
+<use images/image2.png>
+Package pdftex.def Info: images/image2.png  used on input line 94.
+(pdftex.def)             Requested size: 345.0pt x 158.1628pt.
+
+
+[5{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
+
+[6 <./images/image3.png> <./images/image2.png>]
+<images/image1.png, id=35, 341.275pt x 351.3125pt>
 File: images/image1.png Graphic file (type png)
 <use images/image1.png>
-Package pdftex.def Info: images/image1.png  used on input line 93.
+Package pdftex.def Info: images/image1.png  used on input line 108.
 (pdftex.def)             Requested size: 276.00105pt x 284.13806pt.
 
 
-[5]
+LaTeX Warning: `h' float specifier changed to `ht'.
 
-[6 <./images/image1.png>]
 
-[7] (./Proposal.bbl
 
-[8])
+[7]
 
-[9] (./Proposal.aux)
+[8 <./images/image1.png>] (./Proposal.bbl
+
+[9])
+
+[10] (./Proposal.aux)
  ***********
 LaTeX2e <2024-06-01> patch level 2
 L3 programming layer <2024-09-10>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 17830 strings out of 473579
- 364803 string characters out of 5728228
- 729024 words of memory out of 5000000
- 40423 multiletter control sequences out of 15000+600000
+ 17855 strings out of 473579
+ 365318 string characters out of 5728228
+ 728057 words of memory out of 5000000
+ 40448 multiletter control sequences out of 15000+600000
  567223 words of font info for 71 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  99i,8n,107p,1396b,817s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb>
-Output written on Proposal.pdf (9 pages, 302715 bytes).
+Output written on Proposal.pdf (10 pages, 774659 bytes).
 PDF statistics:
- 111 PDF objects out of 1000 (max. 8388607)
- 69 compressed objects within 1 object stream
+ 118 PDF objects out of 1000 (max. 8388607)
+ 71 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 18 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 28 words of extra memory for PDF output out of 10000 (max. 10000000)
 

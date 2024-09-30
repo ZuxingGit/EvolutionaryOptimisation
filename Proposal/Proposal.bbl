@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{10.1007/11732242_56}
 A.~M. Brintrup, H.~Takagi, and J.~Ramsden.
@@ -23,10 +23,11 @@ A.~de~Almeida, B.~Taborda, F.~Santos, K.~Kwiecinski, and S.~Eloy.
 \newblock In {\em 2016 IEEE International Conference on Systems, Man, and
   Cybernetics (SMC)}, pages 002774--002778, 2016.
 
-\bibitem{khade2023}
-R.~Khade, K.~Jariwala, and C.~Chattopadhyay.
-\newblock An interactive floor plan image retrieval framework based on
-  structural features, 2023.
+\bibitem{9511363}
+P.~K. Lee and B.~Stenger.
+\newblock Shape-based floor plan retrieval using parse tree matching.
+\newblock In {\em 2021 17th International Conference on Machine Vision and
+  Applications (MVA)}, pages 1--5, 2021.
 
 \bibitem{doi:10.1177/1478077119832982}
 M.~Nisztuk and P.~B. Myszkowski.
@@ -42,6 +43,12 @@ R.~Subramanian, T.~DheenaDayalan, T.~Badhrirajan, C.~Dhinakaran,
 \newblock In {\em 2021 International Conference on Advancements in Electrical,
   Electronics, Communication, Computing and Automation (ICAECA)}, pages 1--6,
   2021.
+
+\bibitem{WANG20051329}
+L.~Wang.
+\newblock A hybrid genetic algorithm–neural network strategy for simulation
+  optimization.
+\newblock {\em Applied Mathematics and Computation}, 170(2):1329--1343, 2005.
 
 \bibitem{WANG2023100238}
 T.-K. Wang and W.~Duan.

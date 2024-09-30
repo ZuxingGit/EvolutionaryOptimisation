@@ -26,7 +26,7 @@
 \DeclareMathOperator*{\subjectto}{subject\hspace{0.1cm}to}
 %opening
 \title{Evolutionary Optimization of Residential Floor Plans}
-\author{Zuxing Wu\\a1816653\\ \\Supervisors: Adel Nikfarjam\\ }
+\author{Zuxing Wu\\a1816653\\ \\Supervisor: Adel Nikfarjam\\ }
 
 \begin{document}
 
@@ -53,13 +53,18 @@ Residential floor plan design is a critical aspect of architectural design that 
 Evolutionary algorithms have been proposed as a promising alternative for optimizing floor plans, as they can efficiently explore the design space and generate high-quality solutions. Evolutionary algorithms are a class of optimization algorithms inspired by the process of natural selection. They work by maintaining a population of candidate solutions (individuals) and iteratively applying genetic operators (e.g.\ crossover, mutation) to generate new solutions. The fitness of each solution is evaluated based on a predefined fitness function, which measures how well the solution satisfies the objectives of the optimization problems.
 
 \section{Literature Review}
-Previous research has explored the application of evolutionary algorithms to optimize residential floor plans. Brintrup et al.~\cite{10.1007/11732242_56} compared 3 interactive genetic algorithms (i.e.\ sequential IGA, multi-objective IGA, parallel IGA) on a multi-objective floor planning task, and found the multi-objective IGA provides more diverse results and faster convergence for optimizing floor plan. It was found that proportional roulette wheel selection is the best parent selection method for the mating pool, and k-point crossover is the most effective for fitness evolutionary improvement~\cite{7844659}.
+Previous research has explored the application of evolutionary algorithms to optimize residential floor plans. Brintrup et al.~\cite{10.1007/11732242_56} compared three interactive genetic algorithms (i.e., sequential IGA, multi-objective IGA, parallel IGA) on a multi-objective floor planning task, and found that the multi-objective IGA provides more diverse results and faster convergence for optimizing floor plans. They developed interactive evolutionary algorithms that allow designers to incorporate their preferences and constraints into the optimization process. This method has shown promising results in generating floor plans that meet both functional and aesthetic requirements.
 
-Combining Evolutionary algorithm with Greedy-like algorithm can help find the near-optimal solution in Automated Floor Plan Generation (AFPG) though it is a simplified model of multi-objective optimization by linear composition of the partial evaluation functions~\cite{doi:10.1177/1478077119832982}. Subramanian et al.~\cite{9675541} used Genetic Algorithm with KD tree models in a web application to generate floor plans for even non-expert users.
+It was found that proportional roulette wheel selection is the best parent selection method for the mating pool, and k-point crossover is the most effective for fitness evolutionary improvement~\cite{7844659}.
+Combining evolutionary algorithms with greedy-like algorithms can help find near-optimal solutions in Automated Floor Plan Generation (AFPG), though it is a simplified model of multi-objective optimization by linear composition of the partial evaluation functions~\cite{doi:10.1177/1478077119832982}. Subramanian et al.~\cite{9675541} used a genetic algorithm with KD tree models in a web application to generate floor plans for even non-expert users.
 
-Wang and Duan~\cite{WANG2023100238} tried to optimize the floor plan design by focusing on the energy consumption and consumer satisfaction, which proves that the preferences of different types of consumers differed significantly. Therefore, different evaluation criteria are needed for satisfying different family types~\cite{WANG2023100238}. The quality and efficiency of residential floor plan design can be improved by combining Monte Carlo tree search algorithm (MCTS) and particle swarm optimization (PSO)~\cite{YAN2024110546}. The MCTS algorithm takes human experience into consideration so that it can compress the search space and simplify the solution process~\cite{YAN2024110546}. Meanwhile, the PSO algorithm can increase the search speed and efficiency owing to its parallel processing ability~\cite{YAN2024110546}.
+Wang and Duan~\cite{WANG2023100238} tried to optimize floor plan design by focusing on energy consumption and consumer satisfaction, proving that the preferences of different types of consumers differed significantly. Therefore, different evaluation criteria are needed for satisfying different family types~\cite{WANG2023100238}. The quality and efficiency of residential floor plan design can be improved by combining Monte Carlo tree search algorithm (MCTS) and particle swarm optimization (PSO)~\cite{YAN2024110546}. The MCTS algorithm takes human experience into consideration so that it can compress the search space and improve the efficiency of the search process~\cite{YAN2024110546}. The PSO algorithm can handle continuous variables and is suitable for optimizing the size of rooms due to parallel processing~\cite{YAN2024110546}.
 
-Enengy consumption, probable uniformity (PU), and spatial useful daylight illuminance (sUDI) are three objectives that are considered in the optimization process using NSGA-II algorithm, and the results show that the NSGA-II algorithm can provide a set of more sustainable floor plans requiring less computational power and time~\cite{CHAICHI2024108842}.
+Enengy consumption, probable uniformity (PU), and spatial useful daylight illuminance (sUDI) are three objectives that are considered in the optimization process using NSGA-II algorithm, and the results show that the NSGA-II algorithm can provide a set of more sustainable floor plans that requires less computational power and time~\cite{CHAICHI2024108842}. Reliable metrics for evaluating the amount of light and the uniformity of light are tested in the optimization process, and can avoid unwanted convergence because they restrict each other~\cite{CHAICHI2024108842}.
+
+Furthermore, the integration of machine learning techniques with evolutionary algorithms has gained attention in recent decades. For example, Wang~\cite{WANG20051329} proposed a hybrid approach that combines a genetic algorithm with a neural network to predict the fitness of candidate solutions. This method significantly reduces the computational cost of evaluating large populations and accelerates the optimization process.
+
+Overall, the literature indicates that evolutionary algorithms, particularly when combined with other optimization techniques and machine learning methods, offer a powerful tool for optimizing residential floor plans. These approaches not only improve the efficiency and quality of the designs but also provide flexibility in accommodating various design preferences and constraints.
 
 \section{Aims, Objectives of the Project}
 This project aims to develop a new and efficient method for optimizing residential floor plans using evolutionary algorithms, and address some limitations of previous research.
@@ -75,10 +80,20 @@ The main objectives of this project are as follows:
 The methodology of this project involves the application of evolutionary algorithms to optimize residential floor plans. The process will be divided into several key stages: initialization of the population, representation of the floor plan, design of the evolutionary optimization framework, and performance evaluation. These stages are outlined below.
 
 \subsection{Population Initialization}
-The first step in the evolutionary process is to generate an initial population of residential floor plans. An efficient initialization strategy will be employed to ensure diversity within the population while adhering to basic architectural constraints, such as room adjacency and size. Specifically, it contains 2 stages: 1. Locate room positions, 2. Locate wall positions based on room sizes~\cite{10.1145/3355089.3356556}.
+The first step in the evolutionary process is to generate an initial population of residential floor plans. An efficient initialization strategy will be employed to ensure diversity within the population while adhering to basic architectural constraints, such as room adjacency and size. Specifically, it contains 2 stages: 1. Locate room positions (red dots in Figure~\ref{fig2}), 2. Locate wall positions based on room sizes (blue lines in Figure~\ref{fig2})~\cite{10.1145/3355089.3356556}.
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{image3.png}
+  \caption{Population initialization. Figure 2 of Wu et al.~\cite{10.1145/3355089.3356556}}\label{fig2}
+\end{figure}
 
 \subsection{Representation of Floor Plans}
-Residential floor plans will be represented using a novel structure, parse tree~\cite{khade2023}, that encodes the spatial relationships between rooms, such as adjacency and sizes. The representation will be designed to allow for easy manipulation by evolutionary operators (e.g.~crossover and mutation) while preserving architectural feasibility and obeying relevant constraints.
+Residential floor plans will be represented using a novel structure, parse tree~\cite{9511363}, that encodes the spatial relationships between rooms, such as adjacency and sizes. As shown in Figure~\ref{fig1}, the room sizes and adjacencies after split are the same as the original root. This representation will be designed to allow for easy manipulation by evolutionary operators (e.g.~crossover and mutation) while preserving architectural feasibility and obeying relevant constraints.
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{image2.png}
+  \caption{Parse tree representation of floor plans. Figure 3 of Lee and Stenger~\cite{9511363}}\label{fig1}
+\end{figure}
 
 \subsection{Evolutionary Optimization Framework}
 The evolutionary optimization framework will be based on a standard evolutionary algorithm, with modifications to better suit the characteristics of floor plan design. The selection process will prioritize diversity to avoid premature convergence, while the crossover operator will combine features of two or more floor plans to produce offspring with novel characteristics. Mutation will introduce small random changes to further explore the design space. The fitness of each floor plan will be evaluated based on objective criteria (e.g.\ energy consumption), subjective criterion (e.g.\ privacy, comfort, practicality, convenience), and compliance with architectural standards. If necesssary, more than one evolutionary algorithm will be used in the process of optimizing the floor plan. For example, Monte Carlo tree search algorithm (MCTS) handles discrete variables and particle swarm optmization (PSO) deals with continuous variables~\cite{YAN2024110546}.
