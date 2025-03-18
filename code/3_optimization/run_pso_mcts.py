@@ -2,11 +2,11 @@ import multiprocessing
 from shapely.geometry import Polygon
 from shapely.geometry import LineString
 import random
+import numpy as np
 import matplotlib.pyplot as plt
 from shapely.geometry import MultiPolygon
 import os
 import math
-import numpy as np
 from datetime import datetime
 import copy
 
@@ -29,12 +29,12 @@ boundary = Polygon(
 )
 
 # The entry position
-entry = LineString([(7.5, 0), (8.5, 0)])
+entry = LineString([(5.5, 0), (6.5, 0)])
 
 
 # Define room types (type, min_width, max_width, min_depth, max_depth)
 rooms_range = [
-    ("GAR", 2.5, 4, 5.5, 7),  # Garage
+    ("GAR", 3.5, 6, 5.5, 7),  # Garage
     ("LR", 3, 6, 3, 6),  # Living Room
     ("MBR", 3, 6, 3, 6),  # Master Bedroom
     ("BR1", 3, 4.5, 3, 4.5),  # Bedroom
@@ -562,6 +562,60 @@ def check_GAR_side(house):
     return 0
 
 
+## 13. KIC, LR, DN should be in the same cluster
+def check_KIC_LR_DN(house):
+    """
+    KIC, LR, DN should be in the same cluster
+    one of them should touch the other two, at least one
+    """
+    KIC = None
+    LR = None
+    DN = None
+    score = 0
+    total = 3
+    for room in house.rooms:
+        if room.name == "KIC":
+            KIC = room
+        if room.name == "LR":
+            LR = room
+        if room.name == "DN":
+            DN = room
+    if KIC is None and LR is None and DN is None:
+        return 0
+
+    if KIC is not None and LR is not None:
+        if KIC.get_polygon().overlaps(LR.get_polygon()):
+            score += 1
+
+    if KIC is not None and DN is not None:
+        if KIC.get_polygon().overlaps(DN.get_polygon()):
+            score += 1
+
+    if LR is not None and DN is not None:
+        if LR.get_polygon().overlaps(DN.get_polygon()):
+            score += 1
+
+    return score / total
+
+
+## 14. NO rooms should touch the entry
+def check_no_entry_touch(house):
+    """
+    NO rooms should touch the entry. It is kept for hallway only。
+    but can be touched by one point
+    """
+    for room in house.rooms:
+        if room.get_polygon().touches(entry) and (
+            room.name != "HW" or room.name != "LR" or room.name != "DR"
+        ):
+            if room.get_polygon().intersection(entry).geom_type in [
+                "LineString",
+                "MultiLineString",
+            ]:
+                return 0
+    return 1
+
+
 def fitness_partial(house):
     """
     Fitness function with overlap penalty. No window and door involved.
@@ -589,10 +643,12 @@ def fitness_partial(house):
         + south_facing_area(house)
         # + (1 - percentage_hall(house))
         # + percentage_balcony(house)
-        + percentage_interior(house) * 5.0
+        + percentage_interior(house) * 10.0
         # + (1 - dis_BR_BA(house))
         # + (1 - dis_BA_BAL(house))
         + check_GAR_side(house)
+        + check_KIC_LR_DN(house) * 6.0
+        + check_no_entry_touch(house)
     )
 
     return fitness
@@ -625,10 +681,12 @@ def fitness_all(house):
         + south_facing_area(house)
         + (1 - percentage_hall(house))
         + percentage_balcony(house)
-        + percentage_interior(house) * 5.0
+        + percentage_interior(house) * 10.0
         + (1 - dis_BR_BA(house))
         + (1 - dis_BA_BAL(house))
         + check_GAR_side(house)
+        + check_KIC_LR_DN(house) * 6.0
+        + check_no_entry_touch(house)
     )
 
     return fitness
@@ -654,7 +712,7 @@ def draw_windows_doors(room, ax):
         ax.plot(x, y, color="brown", linewidth=3, alpha=1.0)
 
 
-# draw entry, blod and black
+# draw entry, bold and black
 def draw_entry(entry, ax):
     x, y = entry.xy
     ax.plot(x, y, color="black", linewidth=5, alpha=1.0)
@@ -670,7 +728,7 @@ def save_snapshots(
     num_par,
     pso_iter,
 ):
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(4, 6))
     x, y = current_layout.boundary.exterior.xy
     plt.plot(x, y, color="black")
     plt.fill(x, y, color="grey", alpha=0.1)
@@ -740,13 +798,73 @@ def swap_2rooms(layout):
     layout.cluster = layout.get_cluster()
 
     # Debugging information
-    print(f" Swapped rooms: {room1.name} and {room2.name}")
-    print(
-        f" New positions: {room1.name} at ({room1.x}, {room1.y}), {room2.name} at ({room2.x}, {room2.y})"
-    )
-    print(f" Swapped cluster type: {type(layout.cluster)}")
+    # print(f" Swapped rooms: {room1.name} and {room2.name}")
+    # print(
+    #     f" New positions: {room1.name} at ({room1.x}, {room1.y}), {room2.name} at ({room2.x}, {room2.y})"
+    # )
+    # print(f" Swapped cluster type: {type(layout.cluster)}")
 
     return layout
+
+
+# check if whether a side of a room facing outside
+def is_facing_outside(room, side, house):
+    """
+    Check if a side of a room is facing outside, not other rooms
+    """
+    if side == "left":
+        for other_room in house.rooms:
+            if other_room.name != room.name:
+                if (
+                    other_room.x <= room.x
+                    and (other_room.y >= room.y and other_room.y <= room.y + room.depth)
+                    or (
+                        other_room.y + other_room.depth >= room.y
+                        and other_room.y + other_room.depth <= room.y + room.depth
+                    )
+                ):
+                    return False
+
+    elif side == "right":
+        for other_room in house.rooms:
+            if other_room.name != room.name:
+                if (
+                    other_room.x + other_room.width >= room.x + room.width
+                    and (other_room.y >= room.y and other_room.y <= room.y + room.depth)
+                    or (
+                        other_room.y + other_room.depth >= room.y
+                        and other_room.y + other_room.depth <= room.y + room.depth
+                    )
+                ):
+                    return False
+
+    elif side == "top":
+        for other_room in house.rooms:
+            if other_room.name != room.name:
+                if (
+                    other_room.y >= room.y
+                    and (other_room.x >= room.x and other_room.x <= room.x + room.width)
+                    or (
+                        other_room.x + other_room.width >= room.x
+                        and other_room.x + other_room.width <= room.x + room.width
+                    )
+                ):
+                    return False
+
+    elif side == "bottom":
+        for other_room in house.rooms:
+            if other_room.name != room.name:
+                if (
+                    other_room.y + other_room.depth <= room.y + room.depth
+                    and (other_room.x >= room.x and other_room.x <= room.x + room.width)
+                    or (
+                        other_room.x + other_room.width >= room.x
+                        and other_room.x + other_room.width <= room.x + room.width
+                    )
+                ):
+                    return False
+
+    return True
 
 
 # MCTS Node
