@@ -598,11 +598,11 @@ def check_KIC_LR_DN(house):
     return score / total
 
 
-## 14. NO rooms should touch the entry
+## 14. Rooms can touch the entry
 def check_no_entry_touch(house):
     """
-    NO rooms should touch the entry. It is kept for hallway only。
-    but can be touched by one point
+    Entry is kept for hallway | LR | DR.
+    but can be touched by one point with other rooms
     """
     for room in house.rooms:
         if room.get_polygon().touches(entry) and (
@@ -614,6 +614,24 @@ def check_no_entry_touch(house):
             ]:
                 return 0
     return 1
+
+
+## 15. Rooms touches the boundary are preferred
+def check_boundary_touch(house):
+    """
+    Rooms touches the boundary are preferred
+    """
+    score = 0
+    for room in house.rooms:
+        polygon = room.get_polygon()
+        if (
+            polygon.bounds[0] == boundary.bounds[0]
+            or polygon.bounds[1] == boundary.bounds[1]
+            or polygon.bounds[2] == boundary.bounds[2]
+            or polygon.bounds[3] == boundary.bounds[3]
+        ):
+            score += 1
+    return score / len(house.rooms)
 
 
 def fitness_partial(house):
@@ -649,6 +667,7 @@ def fitness_partial(house):
         + check_GAR_side(house)
         + check_KIC_LR_DN(house) * 6.0
         + check_no_entry_touch(house)
+        + check_boundary_touch(house) * len(rooms)
     )
 
     return fitness
