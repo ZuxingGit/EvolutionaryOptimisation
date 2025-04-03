@@ -29,12 +29,13 @@ boundary = Polygon(
 )
 
 # The entry position
-entry = LineString([(5.5, 0), (6.5, 0)])
+entry = LineString([(4.5, 0), (5.5, 0)])
 
 
 # Define room types (type, min_width, max_width, min_depth, max_depth)
 rooms_range = [
     ("GAR", 3.5, 6, 5.5, 7),  # Garage
+    ("LDR", 2, 3, 2, 3),  # Laundry Room
     ("LR", 3, 6, 3, 6),  # Living Room
     ("MBR", 3, 6, 3, 6),  # Master Bedroom
     ("BR1", 3, 4.5, 3, 4.5),  # Bedroom
@@ -122,66 +123,6 @@ class Room:
             ]
         )
 
-    def generate_window(self):
-        """generate a window for the room"""
-        # window width, make sure not bigger than the room width or depth
-        window_width = round(random.uniform(min_window_width, max_window_width), 1)
-        wall = random.choice(["left", "right", "top", "bottom"])
-        if wall == "left" or wall == "right":
-            if window_width > self.depth:
-                window_width = self.depth
-        elif wall == "top" or wall == "bottom":
-            if window_width > self.width:
-                window_width = self.width
-
-        # window starting point
-        if wall == "left":
-            x = self.x
-            y = round(random.uniform(self.y, self.y + self.depth - window_width), 1)
-        elif wall == "right":
-            x = self.x + self.width
-            y = round(random.uniform(self.y, self.y + self.depth - window_width), 1)
-        elif wall == "top":
-            x = round(random.uniform(self.x, self.x + self.width - window_width), 1)
-            y = self.y + self.depth
-        elif wall == "bottom":
-            x = round(random.uniform(self.x, self.x + self.width - window_width), 1)
-            y = self.y
-
-        self.windows.append(Window(window_width, wall, x, y))
-
-    def generate_door(self):
-        """generate a door for the room"""
-        # no door for hallway, living room, dining room
-        # if self.name in ["HW", "LR", "DR"]:
-        #     return None
-
-        # door width, make sure not bigger than the room width or depth
-        door_width = random.uniform(min_door_width, max_door_width) // 0.1 * 0.1
-        wall = random.choice(["left", "right", "top", "bottom"])
-        if wall == "left" or wall == "right":
-            if door_width > self.depth:
-                door_width = self.depth
-        elif wall == "top" or wall == "bottom":
-            if door_width > self.width:
-                door_width = self.width
-
-        # door starting point
-        if wall == "left":
-            x = self.x
-            y = random.uniform(self.y, self.y + self.depth - door_width) // 0.1 * 0.1
-        elif wall == "right":
-            x = self.x + self.width
-            y = random.uniform(self.y, self.y + self.depth - door_width) // 0.1 * 0.1
-        elif wall == "top":
-            x = random.uniform(self.x, self.x + self.width - door_width) // 0.1 * 0.1
-            y = self.y
-        elif wall == "bottom":
-            x = random.uniform(self.x, self.x + self.width - door_width) // 0.1 * 0.1
-            y = self.y + self.depth
-
-        self.doors.append(Door(door_width, wall, x, y))
-
     def __str__(self):
         return f"{self.name} width: {self.width}, depth: {self.depth} at ({self.x}, {self.y})"
 
@@ -199,6 +140,220 @@ class House:
         for room in self.rooms:
             cluster = cluster.union(room.get_polygon())
         return cluster
+
+    def generate_doors_windows(self):
+        for room in self.rooms:
+            if room.name not in ["KIC", "LR", "DR"]:
+                self.generate_door(room)
+            if room.name not in ["GAR"]:
+                self.generate_window(room)
+
+    def generate_window(self, room):
+        """
+        generate a window for the room, no window for garage
+        """
+        if room.name == "GAR":
+            return None
+
+        room.windows = []
+        # First check if one side of the room is facing outside
+        # if not, do not generate window
+        directions = ["left", "right", "top", "bottom"]
+        options = []
+        for direction in directions:
+            if self.is_facing_outside(room, direction):
+                options.append(direction)
+        if not options:
+            return None
+
+        wall = random.choice(options)
+
+        # window width, make sure not bigger than the room width or depth
+        window_width = round(random.uniform(min_window_width, max_window_width), 1)
+        if wall == "left" or wall == "right":
+            if window_width > room.depth:
+                window_width = room.depth
+        elif wall == "top" or wall == "bottom":
+            if window_width > room.width:
+                window_width = room.width
+
+        # window starting point
+        if wall == "left":
+            x = room.x
+            y = round(random.uniform(room.y, room.y + room.depth - window_width), 1)
+        elif wall == "right":
+            x = room.x + room.width
+            y = round(random.uniform(room.y, room.y + room.depth - window_width), 1)
+        elif wall == "top":
+            x = round(random.uniform(room.x, room.x + room.width - window_width), 1)
+            y = room.y + room.depth
+        elif wall == "bottom":
+            x = round(random.uniform(room.x, room.x + room.width - window_width), 1)
+            y = room.y
+
+        room.windows.append(Window(window_width, wall, x, y))
+
+    def generate_door(self, room):
+        """
+        generate a door for the room.
+        no door for kitchen, living room, dining room.
+        Garage can have multiple doors.
+        """
+        if room.name in ["KIC", "LR", "DR"]:
+            return None
+
+        room.doors = []
+        # First check if one side of the room is facing outside
+        # if not, generate door for the room
+        directions = ["left", "right", "top", "bottom"]
+        options = []
+        for direction in directions:
+            if not self.is_facing_outside(
+                room, direction
+            ) and self.is_facing_inside_public(room, direction):
+                options.append(direction)
+        if not options:
+            return None
+
+        wall = random.choice(options)
+
+        # door width, make sure not bigger than the room width or depth
+        door_width = round(random.uniform(min_door_width, max_door_width), 1)
+        if wall == "left" or wall == "right":
+            if door_width > room.depth:
+                door_width = room.depth
+        elif wall == "top" or wall == "bottom":
+            if door_width > room.width:
+                door_width = room.width
+
+        # door starting point
+        if wall == "left":
+            x = room.x
+            y = round(random.uniform(room.y, room.y + room.depth - door_width), 1)
+        elif wall == "right":
+            x = room.x + room.width
+            y = round(random.uniform(room.y, room.y + room.depth - door_width), 1)
+        elif wall == "top":
+            x = round(random.uniform(room.x, room.x + room.width - door_width), 1)
+            y = room.y + room.depth
+        elif wall == "bottom":
+            x = round(random.uniform(room.x, room.x + room.width - door_width), 1)
+            y = room.y
+
+        room.doors.append(Door(door_width, wall, x, y))
+
+    # check if a side of a room facing outside
+    def is_facing_outside(self, room, side):
+        """
+        Check if a side of a room is facing outside, not other rooms
+        """
+        if side == "left":
+            for other_room in self.rooms:
+                if other_room.name != room.name:
+                    if (
+                        other_room.x < room.x
+                        and other_room.y < room.y + room.depth
+                        and other_room.y + other_room.depth > room.y
+                    ):
+                        return False
+
+        elif side == "right":
+            for other_room in self.rooms:
+                if other_room.name != room.name:
+                    if (
+                        other_room.x + other_room.width > room.x + room.width
+                        and other_room.y < room.y + room.depth
+                        and other_room.y + other_room.depth > room.y
+                    ):
+                        return False
+
+        elif side == "top":
+            for other_room in self.rooms:
+                if other_room.name != room.name:
+                    if (
+                        other_room.y + other_room.depth > room.y + room.depth
+                        and other_room.x < room.x + room.width
+                        and other_room.x + other_room.width > room.x
+                    ):
+                        return False
+
+        elif side == "bottom":
+            for other_room in self.rooms:
+                if other_room.name != room.name:
+                    if (
+                        other_room.y < room.y
+                        and other_room.x < room.x + room.width
+                        and other_room.x + other_room.width > room.x
+                    ):
+                        return False
+
+        return True
+
+    # check if a side of a room facing inside and not other private rooms
+    def is_facing_inside_public(self, room, side):
+        """
+        Check if a side of a room is facing inside and touching non-private areas/rooms, e.g. LR, DR, KIC.
+        Or just touching nothing, But must face inside. Must used along with `not is_facing_outside`
+        """
+        if side == "left":
+            wall = LineString([(room.x, room.y), (room.x, room.y + room.depth)])
+            for other_room in self.rooms:
+                if (
+                    other_room.name != room.name
+                    and other_room.name != "LR"
+                    and other_room.name != "DR"
+                    and other_room.name != "KIC"
+                ):
+                    if wall.intersects(other_room.get_polygon()):
+                        return False
+
+        elif side == "right":
+            wall = LineString(
+                [
+                    (room.x + room.width, room.y),
+                    (room.x + room.width, room.y + room.depth),
+                ]
+            )
+            for other_room in self.rooms:
+                if (
+                    other_room.name != room.name
+                    and other_room.name != "LR"
+                    and other_room.name != "DR"
+                    and other_room.name != "KIC"
+                ):
+                    if wall.intersects(other_room.get_polygon()):
+                        return False
+
+        elif side == "top":
+            wall = LineString(
+                [
+                    (room.x, room.y + room.depth),
+                    (room.x + room.width, room.y + room.depth),
+                ]
+            )
+            for other_room in self.rooms:
+                if (
+                    other_room.name != room.name
+                    and other_room.name != "LR"
+                    and other_room.name != "DR"
+                    and other_room.name != "KIC"
+                ):
+                    if wall.intersects(other_room.get_polygon()):
+                        return False
+
+        elif side == "bottom":
+            wall = LineString([(room.x, room.y), (room.x + room.width, room.y)])
+            for other_room in self.rooms:
+                if (
+                    other_room.name != room.name
+                    and other_room.name != "LR"
+                    and other_room.name != "DR"
+                    and other_room.name != "KIC"
+                ):
+                    if wall.intersects(other_room.get_polygon()):
+                        return False
+
+        return True
 
 
 # Feasibility check
@@ -288,7 +443,7 @@ def dis_MBR_BA(house):
 
 
 ## 3. orientation of LR +
-# (0: north; 1: south) , 1 is preferred (in Northern hemisphere)
+# (1: north; 0: south) , 1 is preferred (in Southern hemisphere)
 # check the orientation of living room
 def check_LR_orientation(house):
     LR = None
@@ -298,13 +453,13 @@ def check_LR_orientation(house):
     if LR is None:
         return 0
 
-    # check if the living room is in the south (no other rooms are in its south)
+    # check if the living room is in the North (no other rooms are in its north)
     for other_room in house.rooms:
         if other_room.name != "LR" and other_room.name != "BAL":
             if (
                 other_room.x < room.x + LR.width
                 and other_room.x + other_room.width > LR.x
-                and other_room.y < LR.y
+                and other_room.y + other_room.depth >= LR.y + LR.depth
             ):
                 return 0
     return 1
@@ -355,30 +510,30 @@ def ventilation(house):
     return normalized_ratio
 
 
-## 6. % of south-facing rooms +
+## 6. % of north-facing rooms +
 # to be maximized
-def south_facing_area(house):
-    south_facing_area = 0
+def north_facing_area(house):
+    north_facing_area = 0
     total_area = house.boundary.area
     for room in house.rooms:
         # check if the room is facing south, if no other rooms are in the south
         if room.name != "BAL":
-            is_south_facing = True
+            is_north_facing = True
             for other_room in house.rooms:
                 if other_room.name != room.name:
                     if (
-                        other_room.x < room.x + room.width
+                        other_room.y + other_room.depth > room.y + room.depth
+                        and other_room.x < room.x + room.width
                         and other_room.x + other_room.width > room.x
-                        and other_room.y < room.y
                     ):
-                        is_south_facing = False
+                        is_north_facing = False
                         break
-            if is_south_facing:
-                south_facing_area += room.width * room.depth
+            if is_north_facing:
+                north_facing_area += room.width * room.depth
 
-    per_south_facing = south_facing_area / total_area if total_area != 0 else 0
+    per_north_facing = north_facing_area / total_area if total_area != 0 else 0
 
-    return per_south_facing
+    return per_north_facing
 
 
 ## 7. % of hall -
@@ -437,7 +592,7 @@ def dis_BR_BA(house):
     BR = None
     BA = None
     for room in house.rooms:
-        if room.name == "BR":
+        if room.name.startswith("BR"):
             BR = room
         if room.name == "BA":
             BA = room
@@ -445,9 +600,10 @@ def dis_BR_BA(house):
         return 0
 
     # doors of bedroom and bathroom
-    br_door = BR.doors[0]
-    ba_door = BA.doors[0]
-    if br_door is None or ba_door is None:
+    if len(BR.doors) > 0 and len(BA.doors) > 0:
+        br_door = BR.doors[0]
+        ba_door = BA.doors[0]
+    else:
         return 0
 
     br_door_center = br_door.get_center()
@@ -484,33 +640,34 @@ def dis_BR_BA(house):
 
 ## 11. DIS (BA, BAL) -
 # to be minimised
-# walking distance between the geometric centers of bathroom and balcony
-def dis_BA_BAL(house):
+# walking distance between the geometric centers of bathroom and living room's door
+def dis_BA_LR_door(house):
     BA = None
-    BAL = None
+    LR = None
     for room in house.rooms:
         if room.name == "BA":
             BA = room
-        if room.name == "BAL":
-            BAL = room
-    if BA is None or BAL is None:
+        if room.name == "LR":
+            LR = room
+    if BA is None or LR is None:
         return 0
 
-    # doors of bathroom and balcony
-    ba_door = BA.doors[0]
-    bal_door = BAL.doors[0]
-    if ba_door is None or bal_door is None:
+    # doors of bathroom and living room
+    if len(BA.doors) > 0 and len(LR.doors) > 0:
+        ba_door = BA.doors[0]
+        lr_door = LR.doors[0]
+    else:
         return 0
 
     ba_door_center = ba_door.get_center()
-    bal_door_center = bal_door.get_center()
+    lr_door_center = lr_door.get_center()
 
     # geometric center of bathroom
     ba_center = (BA.x + BA.width / 2, BA.y + BA.depth / 2)
-    # geometric center of balcony
-    bal_center = (BAL.x + BAL.width / 2, BAL.y + BAL.depth / 2)
+    # geometric center of living room
+    lr_center = (LR.x + LR.width / 2, LR.y + LR.depth / 2)
 
-    # walking distance: ba_center -> ba_door_center -> bal_door_center -> bal_center
+    # walking distance: ba_center -> ba_door_center -> lr_door_center -> lr_center
     walking_distance = (
         (
             (ba_center[0] - ba_door_center[0]) ** 2
@@ -518,18 +675,17 @@ def dis_BA_BAL(house):
         )
         ** 0.5
         + (
-            abs(ba_door_center[0] - bal_door_center[0])
-            + abs(ba_door_center[1] - bal_door_center[1])
+            abs(ba_door_center[0] - lr_door_center[0])
+            + abs(ba_door_center[1] - lr_door_center[1])
         )
         + (
-            (bal_door_center[0] - bal_center[0]) ** 2
-            + (bal_door_center[1] - bal_center[1]) ** 2
+            (lr_door_center[0] - lr_center[0]) ** 2
+            + (lr_door_center[1] - lr_center[1]) ** 2
         )
         ** 0.5
     )
-
     max_dis = boundary.bounds[2] + boundary.bounds[3]
-    min_dis = min(BA.width + BAL.width, BA.depth + BAL.depth)
+    min_dis = min(BA.width + LR.width, BA.depth + LR.depth)
     normalized_distance = (walking_distance - min_dis) / (max_dis - min_dis)
 
     return normalized_distance
@@ -539,6 +695,9 @@ def dis_BA_BAL(house):
 # (0: different side; 1: same side), 1 is preferred
 # check if the garage and entry are on the same side
 def check_GAR_side(house):
+    """
+    Check if the garage and entry are on the same side. (0: different side; 1: same side), 1 is preferred
+    """
     GAR = None
     for room in house.rooms:
         if room.name == "GAR":
@@ -547,8 +706,8 @@ def check_GAR_side(house):
         return 0
 
     # check if the garage is on the same side as the entry
-    # 1. check which side the entry is on, entry is represented by a line with 2 points
-    entry_x = entry.xy[0]  # List of x-coordinates: [7.5, 8.5]
+    # 1. check which side the entry is on, entry is represented by a line with 2 points, e.g. [(4.5, 0), (5.5, 0)]
+    entry_x = entry.xy[0]  # List of x-coordinates: [4.5, 5.5]
     entry_y = entry.xy[1]  # List of y-coordinates: [0, 0]
 
     # left or right side
@@ -562,15 +721,15 @@ def check_GAR_side(house):
     return 0
 
 
-## 13. KIC, LR, DN should be in the same cluster
-def check_KIC_LR_DN(house):
+## 13. KIC, LR, DR should be in the same cluster
+def check_KIC_LR_DR(house):
     """
-    KIC, LR, DN should be in the same cluster
+    KIC, LR, DR should be in the same cluster
     one of them should touch the other two, at least one
     """
     KIC = None
     LR = None
-    DN = None
+    DR = None
     score = 0
     total = 3
     for room in house.rooms:
@@ -578,21 +737,21 @@ def check_KIC_LR_DN(house):
             KIC = room
         if room.name == "LR":
             LR = room
-        if room.name == "DN":
-            DN = room
-    if KIC is None and LR is None and DN is None:
+        if room.name == "DR":
+            DR = room
+    if KIC is None and LR is None and DR is None:
         return 0
 
     if KIC is not None and LR is not None:
-        if KIC.get_polygon().overlaps(LR.get_polygon()):
+        if KIC.get_polygon().touches(LR.get_polygon()):
             score += 1
 
-    if KIC is not None and DN is not None:
-        if KIC.get_polygon().overlaps(DN.get_polygon()):
+    if KIC is not None and DR is not None:
+        if KIC.get_polygon().touches(DR.get_polygon()):
             score += 1
 
-    if LR is not None and DN is not None:
-        if LR.get_polygon().overlaps(DN.get_polygon()):
+    if LR is not None and DR is not None:
+        if LR.get_polygon().touches(DR.get_polygon()):
             score += 1
 
     return score / total
@@ -601,7 +760,8 @@ def check_KIC_LR_DN(house):
 ## 14. Rooms can touch the entry
 def check_no_entry_touch(house):
     """
-    Entry is kept for hallway | LR | DR.
+    Entry is kept for HW | LR | DR. Other rooms cannot touch the entry,
+    **(0: unwanted touch, 1: no touch or allowed touch)**
     but can be touched by one point with other rooms
     """
     for room in house.rooms:
@@ -634,41 +794,51 @@ def check_boundary_touch(house):
     return score / len(house.rooms)
 
 
-def fitness_partial(house):
+def cal_overlap_rate(house):
     """
-    Fitness function with overlap penalty. No window and door involved.
+    Calculate the overlap rate of the house
     """
-    # if isinstance(house.cluster, MultiPolygon):
-    #     return 0
-
-    # Evaluate both continuous (room sizes) and discrete (room positions) variables
     rooms = house.rooms
     boundary_area = house.boundary.area
     cluster_area = house.cluster.area
 
     # -1. normalized overlap rate -
     all_rooms_area = sum(room.width * room.depth for room in rooms)
-    overlap_rate = (all_rooms_area - cluster_area) / boundary_area
-    # print(overlap_rate)
+    overlap_rate = (all_rooms_area - cluster_area) / all_rooms_area
+    return overlap_rate
 
-    fitness = (
-        (1 - overlap_rate) * 15.0
-        + dis_MBR_BR(house)
-        + dis_MBR_BA(house)
-        + check_LR_orientation(house)
-        # + check_DR_natural_light(house)
-        # + ventilation(house)
-        + south_facing_area(house)
-        # + (1 - percentage_hall(house))
-        # + percentage_balcony(house)
-        + percentage_interior(house) * 10.0
-        # + (1 - dis_BR_BA(house))
-        # + (1 - dis_BA_BAL(house))
-        + check_GAR_side(house)
-        + check_KIC_LR_DN(house) * 6.0
-        + check_no_entry_touch(house)
-        + check_boundary_touch(house) * len(rooms)
-    )
+
+def fitness_partial(house):
+    """
+    Fitness function with overlap penalty. No window and door involved.
+    """
+    if isinstance(house.cluster, MultiPolygon) or check_GAR_side(house) == 0:
+        return 0
+
+    fitness = 0
+    # Calculate fitness with special order
+    if (fitness := (1 - cal_overlap_rate(house))) < 1:
+        return fitness
+    elif (fitness := fitness + percentage_interior(house)) < 1.6:
+        return fitness
+    else:
+        fitness += (
+            dis_MBR_BR(house) * 2.0
+            + dis_MBR_BA(house) * 2.0
+            + check_LR_orientation(house)
+            # + check_DR_natural_light(house)
+            # + ventilation(house)
+            + north_facing_area(house)
+            # + (1 - percentage_hall(house))
+            # + percentage_balcony(house)
+            # +percentage_interior(house) * 10.0
+            # + (1 - dis_BR_BA(house))
+            # + (1 - dis_BA_BAL(house))
+            + check_GAR_side(house) * 5.0
+            + check_KIC_LR_DR(house)
+            + check_no_entry_touch(house)
+            # + check_boundary_touch(house) * 5.0
+        )
 
     return fitness
 
@@ -677,36 +847,34 @@ def fitness_all(house):
     """
     Fitness function with overlap penalty. Window and door involved.
     """
-    if isinstance(house.cluster, MultiPolygon):
+    # if isinstance(house.cluster, MultiPolygon) or check_GAR_side(house) == 0:
+    if check_GAR_side(house) == 0:
         return 0
 
-    # Evaluate both continuous (room sizes) and discrete (room positions) variables
-    rooms = house.rooms
-    boundary_area = house.boundary.area
-    cluster_area = house.cluster.area
-
-    # -1. normalized overlap rate -
-    all_rooms_area = sum(room.width * room.depth for room in rooms)
-    overlap_rate = (all_rooms_area - cluster_area) / boundary_area
-    # print(overlap_rate)
-
-    fitness = (
-        (1 - overlap_rate) * 15.0
-        + dis_MBR_BR(house)
-        + dis_MBR_BA(house)
-        + check_LR_orientation(house)
-        + check_DR_natural_light(house)
-        # + ventilation(house)
-        + south_facing_area(house)
-        + (1 - percentage_hall(house))
-        + percentage_balcony(house)
-        + percentage_interior(house) * 10.0
-        + (1 - dis_BR_BA(house))
-        + (1 - dis_BA_BAL(house))
-        + check_GAR_side(house)
-        + check_KIC_LR_DN(house) * 6.0
-        + check_no_entry_touch(house)
-    )
+    fitness = 0
+    # Calculate fitness with special order
+    if (fitness := (1 - cal_overlap_rate(house))) < 1:
+        return fitness
+    elif (fitness := fitness + percentage_interior(house)) < 1.6:
+        return fitness
+    else:
+        fitness += (
+            dis_MBR_BR(house) * 2.0
+            + dis_MBR_BA(house) * 2.0
+            + check_LR_orientation(house)
+            + check_DR_natural_light(house)
+            + ventilation(house)
+            + north_facing_area(house)
+            # + (1 - percentage_hall(house))
+            # + percentage_balcony(house)
+            # + percentage_interior(house) * 10.0
+            + (1 - dis_BR_BA(house))
+            + (1 - dis_BA_LR_door(house))
+            # + check_GAR_side(house) * 5.0
+            + check_KIC_LR_DR(house)
+            + check_no_entry_touch(house)
+            # + check_boundary_touch(house) * 5.0
+        )
 
     return fitness
 
@@ -763,7 +931,7 @@ def save_snapshots(
             ha="center",
             va="center",
         )
-        # draw_windows_doors(room, plt)
+        draw_windows_doors(room, plt)
     draw_entry(entry, plt)
 
     plt.gca().set_aspect("equal", adjustable="box")
@@ -814,6 +982,11 @@ def swap_2rooms(layout):
     room1.x, room2.x = room2_x, room1_x
     room1.y, room2.y = room2_y, room1_y
 
+    # clear all windows and doors
+    for room in rooms:
+        room.windows = []
+        room.doors = []
+    layout.generate_doors_windows()
     layout.cluster = layout.get_cluster()
 
     # Debugging information
@@ -824,66 +997,6 @@ def swap_2rooms(layout):
     # print(f" Swapped cluster type: {type(layout.cluster)}")
 
     return layout
-
-
-# check if whether a side of a room facing outside
-def is_facing_outside(room, side, house):
-    """
-    Check if a side of a room is facing outside, not other rooms
-    """
-    if side == "left":
-        for other_room in house.rooms:
-            if other_room.name != room.name:
-                if (
-                    other_room.x <= room.x
-                    and (other_room.y >= room.y and other_room.y <= room.y + room.depth)
-                    or (
-                        other_room.y + other_room.depth >= room.y
-                        and other_room.y + other_room.depth <= room.y + room.depth
-                    )
-                ):
-                    return False
-
-    elif side == "right":
-        for other_room in house.rooms:
-            if other_room.name != room.name:
-                if (
-                    other_room.x + other_room.width >= room.x + room.width
-                    and (other_room.y >= room.y and other_room.y <= room.y + room.depth)
-                    or (
-                        other_room.y + other_room.depth >= room.y
-                        and other_room.y + other_room.depth <= room.y + room.depth
-                    )
-                ):
-                    return False
-
-    elif side == "top":
-        for other_room in house.rooms:
-            if other_room.name != room.name:
-                if (
-                    other_room.y >= room.y
-                    and (other_room.x >= room.x and other_room.x <= room.x + room.width)
-                    or (
-                        other_room.x + other_room.width >= room.x
-                        and other_room.x + other_room.width <= room.x + room.width
-                    )
-                ):
-                    return False
-
-    elif side == "bottom":
-        for other_room in house.rooms:
-            if other_room.name != room.name:
-                if (
-                    other_room.y + other_room.depth <= room.y + room.depth
-                    and (other_room.x >= room.x and other_room.x <= room.x + room.width)
-                    or (
-                        other_room.x + other_room.width >= room.x
-                        and other_room.x + other_room.width <= room.x + room.width
-                    )
-                ):
-                    return False
-
-    return True
 
 
 # MCTS Node
@@ -944,8 +1057,6 @@ class LayoutState:
         x, y = position
         room_type, width, depth = self.rooms[self.current_room]
         new_room = Room(room_type, width, depth, x, y)
-        new_room.generate_window()
-        new_room.generate_door()
 
         # Add buffer to handle geometric issues 💡
         try:
@@ -1037,7 +1148,16 @@ class MCTS:
             if not valid_simulation:
                 reward = 0.0
             elif simulation_state.all_placed():
-                reward = fitness_partial(simulation_state.get_house())
+                house = simulation_state.get_house()
+                house.generate_doors_windows()  # Generate windows and doors for fitness calculation
+                reward = fitness_all(house)
+
+                # Persist the generated windows and doors in the simulation state
+                simulation_state.placed_rooms = (
+                    house.rooms
+                )  # Update rooms with windows and doors
+                simulation_state.cluster = house.cluster  # Update the cluster
+
                 if reward > best_reward:
                     best_reward = reward
                     best_state = simulation_state
@@ -1102,6 +1222,7 @@ class PSO:
                 "sizes": [self.random_size(room) for room in rooms_range],
                 "velocity": [[0, 0] for _ in rooms_range],
                 "pbest_fitness": -float("inf"),
+                # "pbest_fitness_partial": -float("inf"),
                 "pbest_sizes": [],
             }
             self.particles.append(particle)
@@ -1125,7 +1246,7 @@ class PSO:
                 mcts = MCTS(boundary, rooms)
                 best_layout = mcts.search()
                 # print("Best layout:", len(best_layout.rooms))
-                fitness = fitness_partial(best_layout)
+                fitness = fitness_all(best_layout)
 
                 # Update personal best
                 if fitness > particle["pbest_fitness"]:
@@ -1138,9 +1259,9 @@ class PSO:
                     self.gbest_sizes = particle["sizes"].copy()
                     self.gbest_layout = best_layout
 
-            # local search: swap two rooms
+            # local search: swap the position of random two rooms
             swaped_layout = swap_2rooms(copy.deepcopy(self.gbest_layout))
-            swaped_fitness = fitness_partial(swaped_layout)
+            swaped_fitness = fitness_all(swaped_layout)
             if swaped_fitness > self.gbest_fitness:
                 self.gbest_layout = swaped_layout
                 self.gbest_fitness = swaped_fitness
@@ -1217,13 +1338,13 @@ class PSO:
 configurations = [
     # (1000, 200, 200),
     # (150, 200, 200),
-    (150, 200, 2000),
+    # (150, 200, 2000),
     # (150, 600, 200),
     # (300, 20, 2000),
     # (300, 200, 200),
     # (300, 200, 2000),
     # (300, 200, 200),
-    # (300, 1000, 2000),
+    (600, 400, 400),
 ]
 
 
