@@ -34,16 +34,16 @@ entry = LineString([(4.5, 0), (5.5, 0)])
 
 # Define room types (type, min_width, max_width, min_depth, max_depth)
 rooms_range = [
-    ("GAR", 3.5, 6, 5.5, 7),  # Garage
+    ("GAR", 3, 6, 5, 7),  # Garage
     ("LDR", 2, 3, 2, 3),  # Laundry Room
     ("LR", 3, 6, 3, 6),  # Living Room
     ("MBR", 3, 6, 3, 6),  # Master Bedroom
-    ("BR1", 3, 4.5, 3, 4.5),  # Bedroom
+    ("BR1", 3, 5, 3, 5),  # Bedroom
     ("KIC", 2, 4, 2, 4),  # Kitchen
     ("BA", 2, 4, 2, 5),  # Bathroom
     ("DR", 3, 5, 3, 5),  # Dining Room
-    # ("BR2", 3, 4.5, 3, 4.5),  #Bedroom2
-    # ("HW", 1, 1.5, 2, 10),  # Hallway
+    # ("BR2", 3, 5, 3, 5),  #Bedroom2
+    # ("HW", 1, 2, 2, 10),  # Hallway
     # ("BAL", 1, 2, 2, 8),  # Balcony
 ]
 
@@ -106,10 +106,10 @@ class Door:
 class Room:
     def __init__(self, name, width, depth, x, y):
         self.name = name
-        self.width = width
-        self.depth = depth
-        self.x = x
-        self.y = y
+        self.width = int(width)  # Ensure width is an integer
+        self.depth = int(depth)  # Ensure depth is an integer
+        self.x = int(x)  # Ensure x-coordinate is an integer
+        self.y = int(y)  # Ensure y-coordinate is an integer
         self.windows = []
         self.doors = []
 
@@ -855,7 +855,7 @@ def fitness_all(house):
     # Calculate fitness with special order
     if (fitness := (1 - cal_overlap_rate(house))) < 1:
         return fitness
-    elif (fitness := fitness + percentage_interior(house)) < 1.6:
+    elif (fitness := fitness + percentage_interior(house)) < 1.7:
         return fitness
     else:
         fitness += (
@@ -880,9 +880,6 @@ def fitness_all(house):
 
 
 # Parameters
-granularity_size = 0.5
-granularity_position = 0.5
-
 particle_num = 200
 pso_iter = 200
 mcts_iter = 150
@@ -1034,23 +1031,47 @@ class LayoutState:
 
         room_type, width, depth = self.rooms[self.current_room]
         legal_positions = []
-        for x in np.arange(0, self.boundary.bounds[2] - width, granularity_position):
-            for y in np.arange(
-                0, self.boundary.bounds[3] - depth, granularity_position
-            ):
-                legal_positions.append((x, y))
-        # # if cluster is None, all positions are legal
-        # if self.cluster is None:
-        #     for x in np.arange(0, self.boundary.bounds[2]-width, granularity):
-        #         for y in np.arange(0, self.boundary.bounds[3]-depth, granularity):
-        #             legal_positions.append((x, y))
-        # # if cluster is not None, only positions that not in the cluster are legal
-        # else:
-        #     for x in np.arange(0, self.boundary.bounds[2]-width, granularity):
-        #         for y in np.arange(0, self.boundary.bounds[3]-depth, granularity):
-        #             if not Point(x, y).within(self.cluster):
-        #                 legal_positions.append((x, y))
+        # Generate all possible positions as integers
+        x_positions = range(0, int(self.boundary.bounds[2] - width) + 1)
+        y_positions = range(0, int(self.boundary.bounds[3] - depth) + 1)
+        legal_positions = [(x, y) for x in x_positions for y in y_positions]
 
+        """
+        # if cluster is None, all positions are legal
+        if self.cluster is None:
+            # Generate all legal positions directly without checking the cluster
+            x_positions = np.arange(
+                0, self.boundary.bounds[2] - width, granularity_position
+            )
+            y_positions = np.arange(
+                0, self.boundary.bounds[3] - depth, granularity_position
+            )
+            legal_positions = [(x, y) for x in x_positions for y in y_positions]
+        # if cluster is not None, only positions that not in the cluster are legal
+        else:
+            # Use vectorized operations to filter positions outside the cluster
+            x_positions = np.arange(
+                0, self.boundary.bounds[2] - width, granularity_position
+            )
+            y_positions = np.arange(
+                0, self.boundary.bounds[3] - depth, granularity_position
+            )
+            x_grid, y_grid = np.meshgrid(x_positions, y_positions)
+            positions = np.column_stack((x_grid.ravel(), y_grid.ravel()))
+
+            # Filter positions using Shapely's `contains` and `within` methods
+            legal_positions = [
+                (x, y)
+                for x, y in positions
+                if not (
+                    Point(x, y).within(self.cluster)
+                    or Point(x + width, y + depth).within(self.cluster)
+                    or Point(x + width, y).within(self.cluster)
+                    or Point(x, y + depth).within(self.cluster)
+                )
+            ]
+"""
+        # print("Legal positions:", len(legal_positions))
         return legal_positions
 
     def place_room(self, position):
@@ -1058,7 +1079,7 @@ class LayoutState:
         room_type, width, depth = self.rooms[self.current_room]
         new_room = Room(room_type, width, depth, x, y)
 
-        # Add buffer to handle geometric issues 💡
+        # Add buffer to handle geometric issues
         try:
             new_poly = new_room.get_polygon().buffer(0)
             if self.cluster:
@@ -1070,9 +1091,7 @@ class LayoutState:
                 self.cluster = new_poly
 
             self.placed_rooms.append(new_room)
-            # print("Placed room:", len(self.placed_rooms))
             self.current_room += 1
-            # print("Current room:", self.current_room)
             return True
         except Exception:
             return False
@@ -1204,6 +1223,98 @@ class MCTS:
         return best_node.state.get_house()
 
 
+# 1+1 EA algorithm
+class one_plus_one_EA:
+    def __init__(self, boundary, rooms, max_iter=100):
+        self.boundary = boundary
+        self.rooms = rooms
+        self.max_iter = max_iter
+        self.best_layout = None
+        self.best_fitness = -float("inf")
+
+    def search(self):
+        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+        print(f"1+1 EA started at {current_time}")
+        # Initialize the first layout
+        placed_rooms = []
+        legal_positions_array = []
+        index_position_array = []
+        for i, room in enumerate(self.rooms):
+            room_type, width, depth = room
+            # Get all possible positions for rooms
+            x_positions = range(0, int(self.boundary.bounds[2] - width) + 1)
+            y_positions = range(0, int(self.boundary.bounds[3] - depth) + 1)
+            legal_positions = [(x, y) for x in x_positions for y in y_positions]
+            legal_positions_array.append(legal_positions)
+            index_position_array.append(i)
+            len_legal_positions = len(legal_positions)
+            if len_legal_positions == 0:
+                print("No legal positions available for room:", room_type)
+                continue
+
+            # Randomly select a position for the room
+            index = random.randint(0, len_legal_positions - 1)
+            x, y = legal_positions[index]
+            room = Room(room_type, width, depth, x, y)
+            placed_rooms.append(room)
+
+        # Create a new layout
+        new_layout = House(placed_rooms, self.boundary)
+        new_layout.generate_doors_windows()
+        new_layout.cluster = new_layout.get_cluster()
+        self.best_layout = new_layout
+        self.best_fitness = fitness_all(new_layout)
+        print("Initial fitness:", self.best_fitness)
+        # Iterate to find the best layout
+        for i in range(self.max_iter):
+            for i, room in enumerate(placed_rooms):
+                # Generate a mutation rate [0,1]
+                mutation_rate = random.uniform(0, 1)
+                # Mutate this room if mutation_rate < 1/8
+                if mutation_rate < 0.125:
+                    # Get the room type, width, and depth
+                    room_type = room.name
+                    width = room.width
+                    depth = room.depth
+                    # Get all possible positions for the room
+                    legal_positions = legal_positions_array[i]
+                    len_legal_positions = len(legal_positions)
+                    if len_legal_positions == 0:
+                        print("No legal positions available for room:", room_type)
+                        continue
+                    # Get current index of position array
+                    index = index_position_array[i]
+                    # Generate a random number [-5, 5]
+                    random_number = random.randint(-5, 5)
+                    # Get the new index of position array
+                    new_index = (index + random_number) % len_legal_positions
+                    # Get the new position of the room
+                    new_position = legal_positions[new_index]
+                    # Create a new room with the new position
+                    new_room = Room(room_type, width, depth, *new_position)
+                    # Generate a new layout with the new room
+                    new_layout = House(
+                        placed_rooms[:i] + [new_room] + placed_rooms[i + 1 :],
+                        self.boundary,
+                    )
+                    new_layout.generate_doors_windows()
+                    new_layout.cluster = new_layout.get_cluster()
+                    # Calculate the fitness of the new layout
+                    new_fitness = fitness_all(new_layout)
+                    # If the new fitness is better than the best fitness, update the best layout
+                    if new_fitness > self.best_fitness:
+                        self.best_layout = new_layout
+                        self.best_fitness = new_fitness
+                        placed_rooms = (
+                            placed_rooms[:i] + [new_room] + placed_rooms[i + 1 :]
+                        )
+                        print(
+                            f"1+1 Iteration {i}: New best fitness: {self.best_fitness}"
+                        )
+
+        return self.best_layout
+
+
 # PSO-MCTS algorithm
 class PSO:
     def __init__(self, rooms_range, num_particles, max_iter, mcts_iter):
@@ -1222,7 +1333,6 @@ class PSO:
                 "sizes": [self.random_size(room) for room in rooms_range],
                 "velocity": [[0, 0] for _ in rooms_range],
                 "pbest_fitness": -float("inf"),
-                # "pbest_fitness_partial": -float("inf"),
                 "pbest_sizes": [],
             }
             self.particles.append(particle)
@@ -1230,22 +1340,29 @@ class PSO:
     def random_size(self, room):
         min_w, max_w, min_d, max_d = room[1:]
         return [
-            round(random.uniform(min_w, max_w) / granularity_size) * granularity_size,
-            round(random.uniform(min_d, max_d) / granularity_size) * granularity_size,
+            random.randint(int(min_w), int(max_w)),  # Ensure width is an integer
+            random.randint(int(min_d), int(max_d)),  # Ensure depth is an integer
         ]
 
     def optimize(self, boundary):
         current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+        print(f"PSO-MCTS started at {current_time}")
         for _ in range(self.max_iter):
+            print(
+                f"Iteration: {_} started at {datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            )
+            # Evaluate fitness for each particle
             for particle in self.particles:
                 # Evaluate fitness using MCTS
                 rooms = []
                 for i, size in enumerate(particle["sizes"]):
                     rooms.append((self.rooms_range[i][0], size[0], size[1]))
 
-                mcts = MCTS(boundary, rooms)
-                best_layout = mcts.search()
-                # print("Best layout:", len(best_layout.rooms))
+                # mcts = MCTS(boundary, rooms)
+                # best_layout = mcts.search()
+                one_one_EA = one_plus_one_EA(boundary, rooms)
+                best_layout = one_one_EA.search()
+
                 fitness = fitness_all(best_layout)
 
                 # Update personal best
@@ -1259,7 +1376,8 @@ class PSO:
                     self.gbest_sizes = particle["sizes"].copy()
                     self.gbest_layout = best_layout
 
-            # local search: swap the position of random two rooms
+            # Local search: swap the position of random two rooms
+            # print(f"Swap 2 rooms at {datetime.now().strftime("%Y%m%d-%H%M%S")}")
             swaped_layout = swap_2rooms(copy.deepcopy(self.gbest_layout))
             swaped_fitness = fitness_all(swaped_layout)
             if swaped_fitness > self.gbest_fitness:
@@ -1267,6 +1385,9 @@ class PSO:
                 self.gbest_fitness = swaped_fitness
 
             # Update velocities and positions
+            # print(
+            #     f"Update particles velocity at {datetime.now().strftime("%Y%m%d-%H%M%S")}"
+            # )
             for particle in self.particles:
                 for i in range(len(particle["sizes"])):
                     w = 0.5  # inertia
@@ -1294,27 +1415,21 @@ class PSO:
                     particle["sizes"][i] = [
                         max(
                             min(
-                                round(
-                                    (particle["sizes"][i][0] + v[0]) / granularity_size
-                                )
-                                * granularity_size,
+                                particle["sizes"][i][0] + int(v[0]),
                                 self.rooms_range[i][2],
                             ),
                             self.rooms_range[i][1],
                         ),
                         max(
                             min(
-                                round(
-                                    (particle["sizes"][i][1] + v[1]) / granularity_size
-                                )
-                                * granularity_size,
+                                particle["sizes"][i][1] + int(v[1]),
                                 self.rooms_range[i][4],
                             ),
                             self.rooms_range[i][3],
                         ),
                     ]
 
-            # Save snapshots, the initial, final and every 25 iterations
+            # Save snapshots, the initial, final, and every 25 iterations
             if _ == 0 or _ == self.max_iter - 1 or _ % 25 == 0:
                 # force the count number to be like: 0000, 0025, 0050, ...
                 save_snapshots(
@@ -1338,13 +1453,12 @@ class PSO:
 configurations = [
     # (1000, 200, 200),
     # (150, 200, 200),
-    # (150, 200, 2000),
+    (150, 2000, 2000),
     # (150, 600, 200),
     # (300, 20, 2000),
     # (300, 200, 200),
     # (300, 200, 2000),
-    # (300, 200, 200),
-    (600, 400, 400),
+    # (300, 400, 400),
 ]
 
 
