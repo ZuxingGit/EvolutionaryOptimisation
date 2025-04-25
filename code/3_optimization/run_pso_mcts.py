@@ -21,30 +21,30 @@ max_house_depth = 25
 # house_depth = random.randint(min_house_depth, max_house_depth)
 
 # set manually for now
-house_width = 10
-house_depth = 15
+house_width = 16
+house_depth = 10
 
 boundary = Polygon(
     [(0, 0), (house_width, 0), (house_width, house_depth), (0, house_depth)]
 )
 
 # The entry position
-entry = LineString([(4.5, 0), (5.5, 0)])
+entry = LineString([(0, 5), (0, 6)])
 
 
 # Define room types (type, min_width, max_width, min_depth, max_depth)
 rooms_range = [
-    ("GAR", 3, 6, 5, 7),  # Garage
+    ("GAR", 5, 6, 3, 6),  # Garage
     ("LDR", 2, 3, 2, 3),  # Laundry Room
+    ("DR", 3, 5, 3, 5),  # Dining Room
     ("LR", 3, 6, 3, 6),  # Living Room
+    ("KIC", 2, 4, 2, 4),  # Kitchen
     ("MBR", 3, 6, 3, 6),  # Master Bedroom
     ("BR1", 3, 5, 3, 5),  # Bedroom
-    ("KIC", 2, 4, 2, 4),  # Kitchen
-    ("BA", 2, 4, 2, 5),  # Bathroom
-    ("DR", 3, 5, 3, 5),  # Dining Room
-    # ("BR2", 3, 5, 3, 5),  #Bedroom2
-    # ("HW", 1, 2, 2, 10),  # Hallway
-    # ("BAL", 1, 2, 2, 8),  # Balcony
+    ("BA", 2, 4, 2, 4),  # Bathroom
+    # ("BR2", 3, 5, 3, 5),  # Bedroom2
+    # ("HW", 2, 10, 1, 2),  # Hallway
+    # ("BAL", 2, 8, 1, 2),  # Balcony
 ]
 
 
@@ -384,13 +384,15 @@ def is_valid_placement(rect, cluster, boundary):
         return False
 
 
-# Fitness functions
+# ====================Fitness functions=========================================
 
 
 ## 1. dis(MBR, BR) +
-# calculate the distance between the center of the master bedroom and bedroom
-# normalize the distance
 def dis_MBR_BR(house):
+    """
+    1. dis(MBR, BR) +\\
+    calculate the distance between the center of the master bedroom and other bedrooms. Normalized
+    """
     MBR = None
     BR = None
     for room in house.rooms:
@@ -402,23 +404,27 @@ def dis_MBR_BR(house):
         return 0
     mbr_center = (MBR.x + MBR.width / 2, MBR.y + MBR.depth / 2)
     br_center = (BR.x + BR.width / 2, BR.y + BR.depth / 2)
-    min_dis = min(MBR.width + BR.width, MBR.depth + BR.depth)
-    # diagonal distance is the possible max distance between two points
-    max_dis = (boundary.bounds[2] ** 2 + boundary.bounds[3] ** 2) ** 0.5
+    min_dis = min((MBR.width + BR.width) / 2, (MBR.depth + BR.depth) / 2)
+    # 2 rooms put at 2 opposite corners of the house
+    max_dis = (
+        (boundary.bounds[2] - (MBR.width + BR.width) / 2) ** 2
+        + (boundary.bounds[3] - (MBR.depth + BR.depth) / 2) ** 2
+    ) ** 0.5
     distance = (
         (mbr_center[0] - br_center[0]) ** 2 + (mbr_center[1] - br_center[1]) ** 2
     ) ** 0.5
 
-    # normalized_distance = (distance - min_dis) / (max_dis - min_dis)
-    normalized_distance = (distance - 0) / (max_dis - 0)
+    normalized_distance = (distance - min_dis) / (max_dis - min_dis)
 
     return normalized_distance
 
 
 ## 2. dis(MBR, BA) +
-# calculate the distance between the center of the master bedroom and bathroom
-# normalize the distance
 def dis_MBR_BA(house):
+    """
+    2. dis(MBR, BA) + \\
+    calculate the distance between the center of the master bedroom and bathroom. Normalized
+    """
     MBR = None
     BA = None
     for room in house.rooms:
@@ -430,22 +436,28 @@ def dis_MBR_BA(house):
         return 0
     mbr_center = (MBR.x + MBR.width / 2, MBR.y + MBR.depth / 2)
     ba_center = (BA.x + BA.width / 2, BA.y + BA.depth / 2)
-    min_dis = min(MBR.width + BA.width, MBR.depth + BA.depth)
-    max_dis = (boundary.bounds[2] ** 2 + boundary.bounds[3] ** 2) ** 0.5
+    min_dis = min((MBR.width + BA.width) / 2, (MBR.depth + BA.depth) / 2)
+    # 2 rooms put at 2 opposite corners of the house
+    max_dis = (
+        (boundary.bounds[2] - (MBR.width + BA.width) / 2) ** 2
+        + (boundary.bounds[3] - (MBR.depth + BA.depth) / 2) ** 2
+    ) ** 0.5
     distance = (
         (mbr_center[0] - ba_center[0]) ** 2 + (mbr_center[1] - ba_center[1]) ** 2
     ) ** 0.5
 
-    # normalized_distance = (distance - min_dis) / (max_dis - min_dis)
-    normalized_distance = (distance - 0) / (max_dis - 0)
+    normalized_distance = (distance - min_dis) / (max_dis - min_dis)
 
     return normalized_distance
 
 
 ## 3. orientation of LR +
-# (1: north; 0: south) , 1 is preferred (in Southern hemisphere)
-# check the orientation of living room
 def check_LR_orientation(house):
+    """
+    3. orientation of LR +\\
+    check the orientation of living room.
+    (1: north; 0: south) , 1 is preferred (in Southern hemisphere). Normalized.
+    """
     LR = None
     for room in house.rooms:
         if room.name == "LR":
@@ -466,9 +478,12 @@ def check_LR_orientation(house):
 
 
 ## 4. Light in dining room +
-# (0: dark; 1: bright), 1 is preferred
-# natural light can come into the dining room through the window
 def check_DR_natural_light(house):
+    """
+    4. Light in dining room +\\
+    check if there is a window in the dining room so that natural light can come in.
+    (0: dark; 1: bright), 1 is preferred
+    """
     DR = None
     for room in house.rooms:
         if room.name == "DR":
@@ -494,10 +509,13 @@ def check_DR_natural_light(house):
 
 
 ## 5. Ventilation +
-# (Ratio of width to depth of floor plan)
-# to be maximized
-# Calculate the Ration of width to depth of the whole house
 def ventilation(house):
+    """
+    5. Ventilation +\\
+    (Ratio of width to depth of floor plan)\\
+    to be maximized\\
+    Calculate the Ration of width to depth of the whole house
+    """
     house_width = house.cluster.bounds[2]
     house_depth = house.cluster.bounds[3]
 
@@ -513,11 +531,16 @@ def ventilation(house):
 ## 6. % of north-facing rooms +
 # to be maximized
 def north_facing_area(house):
+    """
+    6. % of north-facing rooms +\\
+    Calculate the % of north-facing rooms area in the interior_area
+    """
     north_facing_area = 0
-    total_area = house.boundary.area
+    total_area = 0
     for room in house.rooms:
         # check if the room is facing south, if no other rooms are in the south
         if room.name != "BAL":
+            room_area = room.width * room.depth
             is_north_facing = True
             for other_room in house.rooms:
                 if other_room.name != room.name:
@@ -528,8 +551,10 @@ def north_facing_area(house):
                     ):
                         is_north_facing = False
                         break
+            total_area += room_area
+
             if is_north_facing:
-                north_facing_area += room.width * room.depth
+                north_facing_area += room_area
 
     per_north_facing = north_facing_area / total_area if total_area != 0 else 0
 
@@ -537,8 +562,11 @@ def north_facing_area(house):
 
 
 ## 7. % of hall -
-# Calculate the % of hallway area in the interior_area
 def percentage_hall(house):
+    """
+    7. % of hall -\\
+    Calculate the % of hallway area in the interior_area
+    """
     hall_area = 0
     interior_area = 0
     for room in house.rooms:
@@ -553,8 +581,11 @@ def percentage_hall(house):
 
 
 ## 8. % of balcony +
-# Calculate the % of balcony area in the interior_area
 def percentage_balcony(house):
+    """
+    8. % of balcony +\\
+    Calculate the % of balcony area in the interior_area
+    """
     balcony_area = 0
     interior_area = 0
     for room in house.rooms:
@@ -568,9 +599,12 @@ def percentage_balcony(house):
     return per_balcony
 
 
-## 9. Efficiency rate of the house +
-# the percentage of interior area to the total area of floor plan
-def percentage_interior(house):
+## 9. Utilization rate of the house +
+def utilization_rate(house):
+    """
+    9. Utilization rate of the house +\\
+    Calculate the % of interior area in the total area of the floor plan
+    """
     interior_cluster = None
     total_area = house.boundary.area
     for room in house.rooms:
@@ -586,9 +620,11 @@ def percentage_interior(house):
 
 
 ## 10. DIS (BR, BA) -
-# walking distance between the geometric centers of bedroom and bathroom
-# to be minimized
 def dis_BR_BA(house):
+    """
+    10. DIS (BR, BA) -\\
+    walking distance between the geometric centers of bedroom and bathroom
+    """
     BR = None
     BA = None
     for room in house.rooms:
@@ -638,10 +674,12 @@ def dis_BR_BA(house):
     return normalized_distance
 
 
-## 11. DIS (BA, BAL) -
-# to be minimised
-# walking distance between the geometric centers of bathroom and living room's door
+## 11. DIS (BA, LR_door) -
 def dis_BA_LR_door(house):
+    """
+    11. DIS (BA, LR_door) -\\
+    walking distance between the geometric centers of bathroom and living room's door
+    """
     BA = None
     LR = None
     for room in house.rooms:
@@ -692,8 +730,6 @@ def dis_BA_LR_door(house):
 
 
 ## 12. Close(Garage, entry) +
-# (0: different side; 1: same side), 1 is preferred
-# check if the garage and entry are on the same side
 def check_GAR_side(house):
     """
     Check if the garage and entry are on the same side. (0: different side; 1: same side), 1 is preferred
@@ -721,52 +757,127 @@ def check_GAR_side(house):
     return 0
 
 
-## 13. KIC, LR, DR should be in the same cluster
-def check_KIC_LR_DR(house):
+## 13.1 dis(KIC, LR) -
+def dis_KIC_LR(house):
     """
-    KIC, LR, DR should be in the same cluster
-    one of them should touch the other two, at least one
+    13.1 dis(KIC, LR) -\\
+    Calculate the normalized distance between the Kitchen (KIC) and Living Room (LR). Closer is better
     """
     KIC = None
     LR = None
-    DR = None
-    score = 0
-    total = 3
     for room in house.rooms:
         if room.name == "KIC":
             KIC = room
         if room.name == "LR":
             LR = room
-        if room.name == "DR":
-            DR = room
-    if KIC is None and LR is None and DR is None:
+    if KIC is None or LR is None:
         return 0
 
-    if KIC is not None and LR is not None:
-        if KIC.get_polygon().touches(LR.get_polygon()):
-            score += 1
+    KIC_polygon = KIC.get_polygon()
+    LR_polygon = LR.get_polygon()
+    if (
+        KIC_polygon.within(LR_polygon)
+        or LR_polygon.within(KIC_polygon)
+        or KIC_polygon.overlaps(LR_polygon)
+    ):
+        return 1
 
-    if KIC is not None and DR is not None:
-        if KIC.get_polygon().touches(DR.get_polygon()):
-            score += 1
+    distance = KIC_polygon.distance(LR_polygon)
+    max_dis = (
+        (boundary.bounds[2] - (KIC.width + LR.width)) ** 2
+        + (boundary.bounds[3] - (KIC.depth + LR.depth)) ** 2
+    ) ** 0.5
 
-    if LR is not None and DR is not None:
-        if LR.get_polygon().touches(DR.get_polygon()):
-            score += 1
+    normalized_distance = (distance - 0) / (max_dis - 0)
 
-    return score / total
+    return normalized_distance
+
+
+## 13.2 dis(KIC, DR) -
+def dis_KIC_DR(house):
+    """
+    13.2 dis(KIC, DR) -\\
+    Calculate the normalized distance between the Kitchen (KIC) and Dining Room (DR). Closer is better
+    """
+    KIC = None
+    DR = None
+    for room in house.rooms:
+        if room.name == "KIC":
+            KIC = room
+        if room.name == "DR":
+            DR = room
+    if KIC is None or DR is None:
+        return 0
+
+    KIC_polygon = KIC.get_polygon()
+    DR_polygon = DR.get_polygon()
+    if (
+        KIC_polygon.within(DR_polygon)
+        or DR_polygon.within(KIC_polygon)
+        or KIC_polygon.overlaps(DR_polygon)
+    ):
+        return 1
+
+    distance = KIC_polygon.distance(DR_polygon)
+    max_dis = (
+        (boundary.bounds[2] - (KIC.width + DR.width)) ** 2
+        + (boundary.bounds[3] - (KIC.depth + DR.depth)) ** 2
+    ) ** 0.5
+
+    normalized_distance = (distance - 0) / (max_dis - 0)
+
+    return normalized_distance
+
+
+## 13.3 dis(LR, DR) -
+def dis_LR_DR(house):
+    """
+    13.3 dis(LR, DR) -\\
+    Calculate the normalized distance between the Living Room (LR) and Dining Room (DR). Closer is better
+    """
+    LR = None
+    DR = None
+    for room in house.rooms:
+        if room.name == "LR":
+            LR = room
+        if room.name == "DR":
+            DR = room
+    if LR is None or DR is None:
+        return 0
+
+    LR_polygon = LR.get_polygon()
+    DR_polygon = DR.get_polygon()
+    if (
+        LR_polygon.within(DR_polygon)
+        or DR_polygon.within(LR_polygon)
+        or LR_polygon.overlaps(DR_polygon)
+    ):
+        return 1
+
+    distance = LR_polygon.distance(DR_polygon)
+    max_dis = (
+        (boundary.bounds[2] - (LR.width + DR.width)) ** 2
+        + (boundary.bounds[3] - (LR.depth + DR.depth)) ** 2
+    ) ** 0.5
+
+    normalized_distance = (distance - 0) / (max_dis - 0)
+
+    return normalized_distance
 
 
 ## 14. Rooms can touch the entry
 def check_no_entry_touch(house):
     """
-    Entry is kept for HW | LR | DR. Other rooms cannot touch the entry,
+    Entry is kept for HW, LR, DR, KIC. Other rooms cannot touch the entry,
     **(0: unwanted touch, 1: no touch or allowed touch)**
     but can be touched by one point with other rooms
     """
     for room in house.rooms:
         if room.get_polygon().touches(entry) and (
-            room.name != "HW" or room.name != "LR" or room.name != "DR"
+            room.name != "HW"
+            and room.name != "LR"
+            and room.name != "DR"
+            and room.name != "KIC"
         ):
             if room.get_polygon().intersection(entry).geom_type in [
                 "LineString",
@@ -776,104 +887,315 @@ def check_no_entry_touch(house):
     return 1
 
 
-## 15. Rooms touches the boundary are preferred
-def check_boundary_touch(house):
-    """
-    Rooms touches the boundary are preferred
-    """
-    score = 0
-    for room in house.rooms:
-        polygon = room.get_polygon()
-        if (
-            polygon.bounds[0] == boundary.bounds[0]
-            or polygon.bounds[1] == boundary.bounds[1]
-            or polygon.bounds[2] == boundary.bounds[2]
-            or polygon.bounds[3] == boundary.bounds[3]
-        ):
-            score += 1
-    return score / len(house.rooms)
-
-
+## 15. Calculate the overlap rate of the layout
 def cal_overlap_rate(house):
     """
-    Calculate the overlap rate of the house
+    15. cal_overlap_rate - \\
+    Calculate the overlap rate of the house. To be minimized
     """
     rooms = house.rooms
     boundary_area = house.boundary.area
     cluster_area = house.cluster.area
 
-    # -1. normalized overlap rate -
+    # 16. normalized overlap rate -
     all_rooms_area = sum(room.width * room.depth for room in rooms)
     overlap_rate = (all_rooms_area - cluster_area) / all_rooms_area
     return overlap_rate
 
 
-def fitness_partial(house):
+## 16. Differentiate public and private rooms
+def diff_public_private(house):
     """
-    Fitness function with overlap penalty. No window and door involved.
+    16. Differentiate public and private rooms
     """
-    if isinstance(house.cluster, MultiPolygon) or check_GAR_side(house) == 0:
+    public_rooms = ["LR", "DR", "KIC", "LDR", "GAR"]
+    private_rooms = ["MBR", "BA", "BR1"]
+    total = len(public_rooms) * len(private_rooms)
+    score = 0
+
+    # The center of the entry is the middle of the line
+    entry_center = entry.interpolate(0.5, normalized=True)
+    for room in house.rooms:
+        if room.name in public_rooms:
+            for other_room in house.rooms:
+                if other_room.name in private_rooms:
+                    # calculate the distance between the entry and 2 rooms
+                    room_center = (room.x + room.width / 2, room.y + room.depth / 2)
+                    other_room_center = (
+                        other_room.x + other_room.width / 2,
+                        other_room.y + other_room.depth / 2,
+                    )
+                    # distance between entry and public room
+                    dis_entry_room = (entry_center.x - room_center[0]) ** 2 + (
+                        entry_center.y - room_center[1]
+                    ) ** 2
+                    # distance between entry and private room
+                    dis_entry_other_room = (
+                        entry_center.x - other_room_center[0]
+                    ) ** 2 + (entry_center.y - other_room_center[1]) ** 2
+                    # compare the distance
+                    if dis_entry_room < dis_entry_other_room:
+                        score += 1
+
+    # Normalize the score
+    score = score / total
+
+    return score
+
+
+## 17. KIC facing north +
+def check_KIC_orientation(house):
+    """
+    17. KIC facing north +\\
+    check if the kitchen is in the North (no other rooms are in its north).
+    (1: north; 0: south) , 1 is preferred (in Southern hemisphere). Normalized.
+    """
+    KIC = None
+    for room in house.rooms:
+        if room.name == "KIC":
+            KIC = room
+    if KIC is None:
+        return 0
+    # check if the kitchen is in the North (no other rooms are in its north)
+    for other_room in house.rooms:
+        if other_room.name != "KIC" and other_room.name != "BAL":
+            if (
+                other_room.x < room.x + KIC.width
+                and other_room.x + other_room.width > KIC.x
+                and other_room.y + other_room.depth >= KIC.y + KIC.depth
+            ):
+                return 0
+    return 1
+
+
+## 18. dis(LDR, KIC) -
+def dis_LDR_KIC(house):
+    """
+    18. dis(LDR, KIC) -\\
+    calculate the distance between the center of the LDR and KIC. Normalized
+    """
+    LDR = None
+    KIC = None
+    for room in house.rooms:
+        if room.name == "LDR":
+            LDR = room
+        if room.name == "KIC":
+            KIC = room
+    if LDR is None or KIC is None:
         return 0
 
+    LDR_polygon = LDR.get_polygon()
+    KIC_polygon = KIC.get_polygon()
+    if (
+        LDR_polygon.within(KIC_polygon)
+        or KIC_polygon.within(LDR_polygon)
+        or LDR_polygon.overlaps(KIC_polygon)
+    ):
+        return 1
+
+    distance = LDR_polygon.distance(KIC_polygon)
+    # 2 rooms put at 2 opposite corners of the house
+    max_dis = (
+        (boundary.bounds[2] - (LDR.width + KIC.width)) ** 2
+        + (boundary.bounds[3] - (LDR.depth + KIC.depth)) ** 2
+    ) ** 0.5
+
+    # normalized_distance = (distance - min_dis) / (max_dis - min_dis)
+    normalized_distance = (distance - 0) / (max_dis - 0)
+
+    return normalized_distance
+
+
+## 19. dis(Garage, KIC) -
+def dis_GAR_KIC(house):
+    """
+    19. dis(GAR, KIC) -\\
+    calculate the distance between the GAR and KIC. Normalized
+    """
+    GAR = None
+    KIC = None
+    for room in house.rooms:
+        if room.name == "GAR":
+            GAR = room
+        if room.name == "KIC":
+            KIC = room
+    if GAR is None or KIC is None:
+        return 0
+
+    GAR_polygon = GAR.get_polygon()
+    KIC_polygon = KIC.get_polygon()
+    if (
+        GAR_polygon.within(KIC_polygon)
+        or KIC_polygon.within(GAR_polygon)
+        or GAR_polygon.overlaps(KIC_polygon)
+    ):
+        return 1
+
+    distance = GAR_polygon.distance(KIC_polygon)
+    # 2 rooms put at 2 opposite corners of the house
+    max_dis = (
+        (boundary.bounds[2] - (GAR.width + KIC.width)) ** 2
+        + (boundary.bounds[3] - (GAR.depth + KIC.depth)) ** 2
+    ) ** 0.5
+
+    normalized_distance = (distance - 0) / (max_dis - 0)
+
+    return normalized_distance
+
+
+## 20. dis(MBR, LR) +
+def dis_MBR_LR(house):
+    """
+    20. dis(MBR, LR) +\\
+    calculate the distance between the center of the master bedroom and living room. Normalized
+    """
+    MBR = None
+    LR = None
+    for room in house.rooms:
+        if room.name == "MBR":
+            MBR = room
+        if room.name == "LR":
+            LR = room
+    if MBR is None or LR is None:
+        return 0
+
+    MBR_polygon = MBR.get_polygon()
+    LR_polygon = LR.get_polygon()
+    if (
+        MBR_polygon.within(LR_polygon)
+        or LR_polygon.within(MBR_polygon)
+        or MBR_polygon.overlaps(LR_polygon)
+    ):
+        return 0
+
+    distance = MBR_polygon.distance(LR_polygon)
+    # 2 rooms put at 2 opposite corners of the house
+    max_dis = (
+        (boundary.bounds[2] - (MBR.width + LR.width)) ** 2
+        + (boundary.bounds[3] - (MBR.depth + LR.depth)) ** 2
+    ) ** 0.5
+    # normalized_distance = (distance - min_dis) / (max_dis - min_dis)
+    normalized_distance = (distance - 0) / (max_dis - 0)
+
+    return normalized_distance
+
+
+## 21. dis(MBR, KIC) +
+def dis_MBR_KIC(house):
+    """
+    21. dis(MBR, KIC) +\\
+    calculate the distance between the center of the master bedroom and kitchen. Normalized
+    """
+    MBR = None
+    KIC = None
+    for room in house.rooms:
+        if room.name == "MBR":
+            MBR = room
+        if room.name == "KIC":
+            KIC = room
+    if MBR is None or KIC is None:
+        return 0
+
+    MBR_polygon = MBR.get_polygon()
+    KIC_polygon = KIC.get_polygon()
+    if (
+        MBR_polygon.within(KIC_polygon)
+        or KIC_polygon.within(MBR_polygon)
+        or MBR_polygon.overlaps(KIC_polygon)
+    ):
+        return 0
+
+    distance = MBR_polygon.distance(KIC_polygon)
+    # 2 rooms put at 2 opposite corners of the house
+    max_dis = (
+        (boundary.bounds[2] - (MBR.width + KIC.width)) ** 2
+        + (boundary.bounds[3] - (MBR.depth + KIC.depth)) ** 2
+    ) ** 0.5
+    # normalized_distance = (distance - min_dis) / (max_dis - min_dis)
+    normalized_distance = (distance - 0) / (max_dis - 0)
+
+    return normalized_distance
+
+
+def fitness_partial(house):
+    """
+    Partial Fitness function with overlap penalty & utilization rate. No window and door involved.
+    """
     fitness = 0
+    penalty = 0
+    if check_GAR_side(house) == 0:
+        penalty += 0.5
+    if check_no_entry_touch(house) == 0:
+        penalty += 0.5
+
     # Calculate fitness with special order
     if (fitness := (1 - cal_overlap_rate(house))) < 1:
-        return fitness
-    elif (fitness := fitness + percentage_interior(house)) < 1.6:
-        return fitness
+        return fitness - penalty
+    elif (fitness := fitness + utilization_rate(house)) < 1.75:
+        return fitness - penalty
     else:
         fitness += (
-            dis_MBR_BR(house) * 2.0
-            + dis_MBR_BA(house) * 2.0
-            + check_LR_orientation(house)
-            # + check_DR_natural_light(house)
-            # + ventilation(house)
-            + north_facing_area(house)
-            # + (1 - percentage_hall(house))
-            # + percentage_balcony(house)
-            # +percentage_interior(house) * 10.0
-            # + (1 - dis_BR_BA(house))
-            # + (1 - dis_BA_BAL(house))
-            + check_GAR_side(house) * 5.0
-            + check_KIC_LR_DR(house)
-            + check_no_entry_touch(house)
-            # + check_boundary_touch(house) * 5.0
+            # utilization_rate(house) * 20
+            # + dis_MBR_BR(house)
+            # + dis_MBR_BA(house)
+            check_LR_orientation(house) * 2
+            # # + ventilation(house)
+            # + north_facing_area(house)
+            # # + check_GAR_side(house)
+            + (1 - dis_KIC_LR(house))
+            + (1 - dis_KIC_DR(house))
+            + (1 - dis_LR_DR(house))
+            # # + check_no_entry_touch(house)
+            + diff_public_private(house) * 15
+            + check_KIC_orientation(house) * 2
+            + (1 - dis_LDR_KIC(house))
+            + (1 - dis_GAR_KIC(house))
+            + dis_MBR_LR(house)
+            + dis_MBR_KIC(house)
         )
 
-    return fitness
+    # fitness += diff_public_private(house)
+
+    return fitness - penalty
 
 
 def fitness_all(house):
     """
-    Fitness function with overlap penalty. Window and door involved.
+    Fitness function with overlap penalty. Windows and doors involved.
     """
     # if isinstance(house.cluster, MultiPolygon) or check_GAR_side(house) == 0:
-    if check_GAR_side(house) == 0:
+    if check_GAR_side(house) == 0 or check_no_entry_touch(house) == 0:
         return 0
 
     fitness = 0
     # Calculate fitness with special order
     if (fitness := (1 - cal_overlap_rate(house))) < 1:
         return fitness
-    elif (fitness := fitness + percentage_interior(house)) < 1.7:
-        return fitness
+    # elif (fitness := fitness + utilization_rate(house)) < 1.8:
+    #     return fitness
     else:
         fitness += (
-            dis_MBR_BR(house) * 2.0
-            + dis_MBR_BA(house) * 2.0
-            + check_LR_orientation(house)
-            + check_DR_natural_light(house)
-            + ventilation(house)
-            + north_facing_area(house)
-            # + (1 - percentage_hall(house))
-            # + percentage_balcony(house)
-            # + percentage_interior(house) * 10.0
-            + (1 - dis_BR_BA(house))
-            + (1 - dis_BA_LR_door(house))
-            # + check_GAR_side(house) * 5.0
-            + check_KIC_LR_DR(house)
-            + check_no_entry_touch(house)
-            # + check_boundary_touch(house) * 5.0
+            utilization_rate(house)
+            + dis_MBR_BR(house)
+            # + dis_MBR_BA(house)
+            # + check_LR_orientation(house)
+            # # + ventilation(house)
+            # + north_facing_area(house)
+            # # + check_GAR_side(house)
+            # + (1 - dis_KIC_LR(house))
+            # + (1 - dis_KIC_DR(house))
+            # + (1 - dis_LR_DR(house))
+            # # + check_no_entry_touch(house)
+            # + diff_public_private(house) * 12
+            # + check_KIC_orientation(house)
+            # + (1 - dis_LDR_KIC(house))
+            # + (1 - dis_GAR_KIC(house))
+            # + dis_MBR_LR(house)
+            # + dis_MBR_KIC(house)
+            # ============⬇️window/door involved⬇️===========================
+            ## + check_DR_natural_light(house)
+            # + (1 - dis_BR_BA(house))
+            # + (1 - dis_BA_LR_door(house))
         )
 
     return fitness
@@ -912,7 +1234,7 @@ def save_snapshots(
     num_par,
     pso_iter,
 ):
-    plt.figure(figsize=(4, 6))
+    plt.figure(figsize=(6, 4))
     x, y = current_layout.boundary.exterior.xy
     plt.plot(x, y, color="black")
     plt.fill(x, y, color="grey", alpha=0.1)
@@ -920,7 +1242,11 @@ def save_snapshots(
         room_polygon = room.get_polygon()
         x, y = room_polygon.exterior.xy
         plt.fill(x, y, alpha=0.7)
-        plt.plot(x, y, alpha=0.9)
+        # use dotted line for LR, KIC, DR
+        if room.name in ["LR", "KIC", "DR"]:
+            plt.plot(x, y, color="black", linestyle="--", alpha=0.8)
+        else:
+            plt.plot(x, y, alpha=0.9)
         plt.text(
             room_polygon.centroid.x,
             room_polygon.centroid.y,
@@ -934,7 +1260,7 @@ def save_snapshots(
     plt.gca().set_aspect("equal", adjustable="box")
     plt.gca().spines["right"].set_visible(False)
     plt.gca().spines["top"].set_visible(False)
-    plt.grid(True, linestyle="--", alpha=0.1)
+    plt.grid(True, linestyle="--", alpha=0.2)
     plt.title(f"Fitness: {fitness}")
     # create target folder if not exists
     if not os.path.exists(f"results/{starting_time}/{mcts_iter}_{num_par}_{pso_iter}"):
@@ -979,12 +1305,12 @@ def swap_2rooms(layout):
     room1.x, room2.x = room2_x, room1_x
     room1.y, room2.y = room2_y, room1_y
 
-    # clear all windows and doors
-    for room in rooms:
-        room.windows = []
-        room.doors = []
-    layout.generate_doors_windows()
-    layout.cluster = layout.get_cluster()
+    # # clear all windows and doors
+    # for room in rooms:
+    #     room.windows = []
+    #     room.doors = []
+    # layout.generate_doors_windows()
+    # layout.cluster = layout.get_cluster()
 
     # Debugging information
     # print(f" Swapped rooms: {room1.name} and {room2.name}")
@@ -996,235 +1322,12 @@ def swap_2rooms(layout):
     return layout
 
 
-# MCTS Node
-class MCTSNode:
-    def __init__(self, state, parent=None, action=None):
-        self.state = state
-        self.parent = parent
-        self.action = action
-        self.children = []
-        self.visits = 0
-        self.value = 0
-        self.untried_actions = state.get_legal_actions()
-
-
-# Layout State
-class LayoutState:
-    def __init__(self, boundary, rooms):
-        self.boundary = boundary
-        self.rooms = rooms
-        self.current_room = 0
-        self.placed_rooms = []
-        self.cluster = None
-
-    def copy(self):
-        """Create a deep copy of the state."""
-        new_state = LayoutState(self.boundary, self.rooms)
-        new_state.current_room = self.current_room
-        new_state.placed_rooms = self.placed_rooms.copy()
-        new_state.cluster = self.cluster
-        return new_state
-
-    def get_legal_actions(self):
-        if self.current_room >= len(self.rooms):
-            return []
-
-        room_type, width, depth = self.rooms[self.current_room]
-        legal_positions = []
-        # Generate all possible positions as integers
-        x_positions = range(0, int(self.boundary.bounds[2] - width) + 1)
-        y_positions = range(0, int(self.boundary.bounds[3] - depth) + 1)
-        legal_positions = [(x, y) for x in x_positions for y in y_positions]
-
-        """
-        # if cluster is None, all positions are legal
-        if self.cluster is None:
-            # Generate all legal positions directly without checking the cluster
-            x_positions = np.arange(
-                0, self.boundary.bounds[2] - width, granularity_position
-            )
-            y_positions = np.arange(
-                0, self.boundary.bounds[3] - depth, granularity_position
-            )
-            legal_positions = [(x, y) for x in x_positions for y in y_positions]
-        # if cluster is not None, only positions that not in the cluster are legal
-        else:
-            # Use vectorized operations to filter positions outside the cluster
-            x_positions = np.arange(
-                0, self.boundary.bounds[2] - width, granularity_position
-            )
-            y_positions = np.arange(
-                0, self.boundary.bounds[3] - depth, granularity_position
-            )
-            x_grid, y_grid = np.meshgrid(x_positions, y_positions)
-            positions = np.column_stack((x_grid.ravel(), y_grid.ravel()))
-
-            # Filter positions using Shapely's `contains` and `within` methods
-            legal_positions = [
-                (x, y)
-                for x, y in positions
-                if not (
-                    Point(x, y).within(self.cluster)
-                    or Point(x + width, y + depth).within(self.cluster)
-                    or Point(x + width, y).within(self.cluster)
-                    or Point(x, y + depth).within(self.cluster)
-                )
-            ]
-"""
-        # print("Legal positions:", len(legal_positions))
-        return legal_positions
-
-    def place_room(self, position):
-        x, y = position
-        room_type, width, depth = self.rooms[self.current_room]
-        new_room = Room(room_type, width, depth, x, y)
-
-        # Add buffer to handle geometric issues
-        try:
-            new_poly = new_room.get_polygon().buffer(0)
-            if self.cluster:
-                combined = self.cluster.buffer(0).union(new_poly)
-                if not combined.is_valid:
-                    return False
-                self.cluster = combined
-            else:
-                self.cluster = new_poly
-
-            self.placed_rooms.append(new_room)
-            self.current_room += 1
-            return True
-        except Exception:
-            return False
-
-    def all_placed(self):
-        """Check if all rooms have been placed."""
-        return self.current_room >= len(self.rooms)
-
-    def get_house(self):
-        """Create a House object from the current state."""
-        # print("Placed--rooms:", len(self.placed_rooms))
-        return House(self.placed_rooms, self.boundary)
-
-
-# MCTS algorithm
-class MCTS:
-    def __init__(self, boundary, rooms, iterations=mcts_iter, exploration=1.414):
-        self.boundary = boundary
-        self.rooms = rooms
-        self.iterations = iterations
-        self.exploration = exploration
-
-    def search(self):
-        root_state = LayoutState(self.boundary, self.rooms)
-        root_node = MCTSNode(root_state)
-        best_reward = -float("inf")
-        best_state = None
-
-        for _ in range(self.iterations):
-            node = root_node
-            state = root_state.copy()
-            valid_simulation = True
-
-            # Selection with validity check
-            while node.untried_actions == [] and node.children != []:
-                # print("Selecting child")
-                node = self.select_child(node)
-                if not state.place_room(node.action):
-                    valid_simulation = False
-                    break
-
-            if not valid_simulation:
-                continue  # Skip invalid paths
-
-            # Expansion with smart action selection
-            if node.untried_actions:
-                action = random.choice(node.untried_actions)
-                # print("Expanding with action")
-                if state.place_room(action):
-                    node.untried_actions.remove(action)
-                    new_node = MCTSNode(state.copy(), node, action)
-                    node.children.append(new_node)
-                    node = new_node
-
-            # Enhanced simulation with retry mechanism
-            simulation_state = state.copy()
-            max_attempts = 100
-            attempts = 0
-            while not simulation_state.all_placed() and attempts < max_attempts:
-                legal_actions = simulation_state.get_legal_actions()
-                if not legal_actions:
-                    valid_simulation = False
-                    break
-                action = random.choice(legal_actions)
-                if not simulation_state.place_room(action):
-                    valid_simulation = False
-                    break
-                # print("Correct place?:", simulation_state.place_room(action))
-
-                attempts += 1
-
-            # Reward calculation
-            if not valid_simulation:
-                reward = 0.0
-            elif simulation_state.all_placed():
-                house = simulation_state.get_house()
-                house.generate_doors_windows()  # Generate windows and doors for fitness calculation
-                reward = fitness_all(house)
-
-                # Persist the generated windows and doors in the simulation state
-                simulation_state.placed_rooms = (
-                    house.rooms
-                )  # Update rooms with windows and doors
-                simulation_state.cluster = house.cluster  # Update the cluster
-
-                if reward > best_reward:
-                    best_reward = reward
-                    best_state = simulation_state
-
-            # Backpropagation
-            current_node = node
-            while current_node is not None:
-                current_node.visits += 1
-                current_node.value += reward
-                current_node = current_node.parent
-
-        # print("Reward:", reward)
-        # # print("node.visits:", root_node.visits)
-        # print("node.children:", len(root_node.children))
-        # # print("node.action:", node.action)
-        # return self.get_best_layout(root_node.children)
-        if best_state:
-            return best_state.get_house()
-        else:
-            return self.get_best_layout(root_node.children)
-
-    def select_child(self, node):
-        log_total = math.log(node.visits)
-        best_score = -float("inf")
-        best_child = None
-
-        for child in node.children:
-            score = child.value / child.visits + self.exploration * math.sqrt(
-                log_total / child.visits
-            )
-            if score > best_score:
-                best_score = score
-                best_child = child
-
-        return best_child
-
-    def get_best_layout(self, children):
-        best_value = -float("inf")
-        best_node = None
-        for child in children:
-            if child.visits > best_value:
-                best_value = child.visits
-                best_node = child
-        return best_node.state.get_house()
-
-
 # 1+1 EA algorithm
-class one_plus_one_EA:
+class Position_OnePlusOneEA:
+    """
+    1+1 EA algorithm for mutating room's position
+    """
+
     def __init__(self, boundary, rooms, max_iter=100):
         self.boundary = boundary
         self.rooms = rooms
@@ -1233,13 +1336,13 @@ class one_plus_one_EA:
         self.best_fitness = -float("inf")
 
     def search(self):
-        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
-        print(f"1+1 EA started at {current_time}")
         # Initialize the first layout
         placed_rooms = []
         legal_positions_array = []
         index_position_array = []
         for i, room in enumerate(self.rooms):
+            # print("Room:", room)
+
             room_type, width, depth = room
             # Get all possible positions for rooms
             x_positions = range(0, int(self.boundary.bounds[2] - width) + 1)
@@ -1260,18 +1363,16 @@ class one_plus_one_EA:
 
         # Create a new layout
         new_layout = House(placed_rooms, self.boundary)
-        new_layout.generate_doors_windows()
-        new_layout.cluster = new_layout.get_cluster()
         self.best_layout = new_layout
-        self.best_fitness = fitness_all(new_layout)
-        print("Initial fitness:", self.best_fitness)
+        self.best_fitness = fitness_partial(new_layout)
+        # print("Initial fitness:", self.best_fitness)
         # Iterate to find the best layout
-        for i in range(self.max_iter):
+        for j in range(self.max_iter):
             for i, room in enumerate(placed_rooms):
-                # Generate a mutation rate [0,1]
+                # Generate a mutation rate [0, 1]
                 mutation_rate = random.uniform(0, 1)
                 # Mutate this room if mutation_rate < 1/8
-                if mutation_rate < 0.125:
+                if mutation_rate <= 0.125:
                     # Get the room type, width, and depth
                     room_type = room.name
                     width = room.width
@@ -1284,8 +1385,8 @@ class one_plus_one_EA:
                         continue
                     # Get current index of position array
                     index = index_position_array[i]
-                    # Generate a random number [-5, 5]
-                    random_number = random.randint(-5, 5)
+                    # Generate a random number [-50, 50]
+                    random_number = random.randint(-50, 50)
                     # Get the new index of position array
                     new_index = (index + random_number) % len_legal_positions
                     # Get the new position of the room
@@ -1297,10 +1398,9 @@ class one_plus_one_EA:
                         placed_rooms[:i] + [new_room] + placed_rooms[i + 1 :],
                         self.boundary,
                     )
-                    new_layout.generate_doors_windows()
-                    new_layout.cluster = new_layout.get_cluster()
+
                     # Calculate the fitness of the new layout
-                    new_fitness = fitness_all(new_layout)
+                    new_fitness = fitness_partial(new_layout)
                     # If the new fitness is better than the best fitness, update the best layout
                     if new_fitness > self.best_fitness:
                         self.best_layout = new_layout
@@ -1308,14 +1408,12 @@ class one_plus_one_EA:
                         placed_rooms = (
                             placed_rooms[:i] + [new_room] + placed_rooms[i + 1 :]
                         )
-                        print(
-                            f"1+1 Iteration {i}: New best fitness: {self.best_fitness}"
-                        )
+                        index_position_array[i] = new_index
 
-        return self.best_layout
+        return self.best_layout, self.best_fitness
 
 
-# PSO-MCTS algorithm
+# PSO & (1+1)_EA algorithm
 class PSO:
     def __init__(self, rooms_range, num_particles, max_iter, mcts_iter):
         self.rooms_range = rooms_range
@@ -1325,6 +1423,7 @@ class PSO:
         self.gbest_sizes = []
         self.gbest_layout = None
         self.mcts_iter = mcts_iter
+        self.full_fitness = -float("inf")
 
         # Initialize particles
         self.particles = []
@@ -1346,13 +1445,10 @@ class PSO:
 
     def optimize(self, boundary):
         current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
-        print(f"PSO-MCTS started at {current_time}")
+        print(f"PSO started at {current_time}")
         for _ in range(self.max_iter):
-            print(
-                f"Iteration: {_} started at {datetime.now().strftime('%Y%m%d-%H%M%S')}"
-            )
             # Evaluate fitness for each particle
-            for particle in self.particles:
+            for index, particle in enumerate(self.particles):
                 # Evaluate fitness using MCTS
                 rooms = []
                 for i, size in enumerate(particle["sizes"]):
@@ -1360,10 +1456,12 @@ class PSO:
 
                 # mcts = MCTS(boundary, rooms)
                 # best_layout = mcts.search()
-                one_one_EA = one_plus_one_EA(boundary, rooms)
-                best_layout = one_one_EA.search()
+                one_one_EA = Position_OnePlusOneEA(boundary, rooms)
+                best_layout, fitness = one_one_EA.search()
+                # if _ % 5 == 0:
+                #     print(f"Particle {index}, Iteration {_}: Best fitness: {fitness}")
 
-                fitness = fitness_all(best_layout)
+                # fitness = fitness_all(best_layout)
 
                 # Update personal best
                 if fitness > particle["pbest_fitness"]:
@@ -1377,22 +1475,31 @@ class PSO:
                     self.gbest_layout = best_layout
 
             # Local search: swap the position of random two rooms
-            # print(f"Swap 2 rooms at {datetime.now().strftime("%Y%m%d-%H%M%S")}")
             swaped_layout = swap_2rooms(copy.deepcopy(self.gbest_layout))
-            swaped_fitness = fitness_all(swaped_layout)
+            swaped_fitness = fitness_partial(swaped_layout)
             if swaped_fitness > self.gbest_fitness:
                 self.gbest_layout = swaped_layout
                 self.gbest_fitness = swaped_fitness
 
+            # if self.gbest_fitness >= 1.6:
+            #     # Add doors and windows to the global best layout
+            #     copied_layout = copy.deepcopy(self.gbest_layout)
+            #     copied_layout.generate_doors_windows()
+            #     copied_layout.get_cluster()
+            #     tmp_full_fitness = fitness_all(copied_layout)
+            #     if tmp_full_fitness > self.full_fitness:
+            #         self.full_fitness = tmp_full_fitness
+            #         self.gbest_layout = copied_layout
+
+            print(
+                f"Iteration {_} finished at: {datetime.now().strftime('%Y%m%d-%H%M%S')}, Fitness: {self.gbest_fitness}"
+            )
             # Update velocities and positions
-            # print(
-            #     f"Update particles velocity at {datetime.now().strftime("%Y%m%d-%H%M%S")}"
-            # )
             for particle in self.particles:
                 for i in range(len(particle["sizes"])):
                     w = 0.5  # inertia
-                    c1 = 0.6  # cognitive
-                    c2 = 0.9  # social
+                    c1 = 0.4  # cognitive
+                    c2 = 0.4  # social
 
                     v = [
                         w * particle["velocity"][i][0]
@@ -1448,12 +1555,110 @@ class PSO:
         return self.gbest_layout
 
 
+# (1+1)_EA algorithm for mutate room's width and depth
+class Size_OnePlusOneEA:
+    """
+    1+1 EA algorithm for mutating room's width and depth after 1+1 EA for Position
+    """
+
+    def __init__(self, boundary, rooms_range, max_iter=20000):
+        self.boundary = boundary
+        self.rooms_range = rooms_range
+        self.max_iter = max_iter
+        self.best_layout = None
+        self.best_layout_rooms = []
+        self.best_fitness = -float("inf")
+
+    def search(self):
+        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+        # 0. generate the first layout
+        rooms = []
+        for i, room in enumerate(self.rooms_range):
+            w = random.randint(int(room[1]), int(room[2]))
+            d = random.randint(int(room[3]), int(room[4]))
+            self.best_layout_rooms.append((room[0], w, d))
+
+        # 1. randomly mutate room(s)' width and depth
+        for i in range(self.max_iter):
+            rooms = self.best_layout_rooms.copy()
+            for j, room in enumerate(rooms):
+                # generate a mutation rate [0, 1]
+                mutation_rate = random.uniform(0, 1)
+                # Mutate this room size if mutation_rate < 1/8
+                if mutation_rate <= 0.125:
+                    # Get the room type, width, and depth
+                    room_type = room[0]
+                    width = room[1]
+                    depth = room[2]
+                    # generate 2 random numbers [-3, 3]
+                    random_number1 = random.randint(-3, 3)
+                    random_number2 = random.randint(-3, 3)
+                    # Get the new size of the room
+                    new_width = max(
+                        min(
+                            width + random_number1,
+                            self.rooms_range[j][2],
+                        ),
+                        self.rooms_range[j][1],
+                    )
+                    new_depth = max(
+                        min(
+                            depth + random_number2,
+                            self.rooms_range[j][4],
+                        ),
+                        self.rooms_range[j][3],
+                    )
+                    # Create a new room with the new size
+                    new_room = (room_type, new_width, new_depth)
+                    # replace the room with the new size
+                    rooms[j] = new_room
+
+            # 2. put it into Position_OnePlusOneEA to get the best layout for current sizes
+            one_one_EA = Position_OnePlusOneEA(self.boundary, rooms)
+            best_layout, fitness = one_one_EA.search()
+            if fitness > self.best_fitness:
+                self.best_layout = best_layout
+                self.best_fitness = fitness
+                self.best_layout_rooms = rooms.copy()
+                # save snapshots every time better layout is found
+                # force the count number to be like: 0000, 0025, 0050, ...
+                save_snapshots(
+                    current_time,
+                    self.best_layout,
+                    str(i).zfill(4),
+                    self.best_fitness,
+                    0,
+                    0,
+                    0,
+                )
+                print(
+                    f"Iteration: {i}, Polygon Type: {self.best_layout.cluster.geom_type}, Fitness: {self.best_fitness}"
+                )
+
+            if i == self.max_iter - 1:
+                save_snapshots(
+                    current_time,
+                    self.best_layout,
+                    str(i).zfill(4),
+                    self.best_fitness,
+                    0,
+                    0,
+                    0,
+                )
+                print(
+                    f"Iteration: {i}, Polygon Type: {self.best_layout.cluster.geom_type}, Fitness: {self.best_fitness}"
+                )
+
+        return self.best_layout, self.best_fitness
+
+
 # List of configurations
 # (mcts_iter, num_particles, pso_iter)
 configurations = [
     # (1000, 200, 200),
     # (150, 200, 200),
-    (150, 2000, 2000),
+    (150, 100, 2000),
+    # (150, 2000, 2000),
     # (150, 600, 200),
     # (300, 20, 2000),
     # (300, 200, 200),
@@ -1464,13 +1669,17 @@ configurations = [
 
 def run_pso_mcts(mcts_iter, num_particles, pso_iter):
     print(
-        f"Running PSO-MCTS with mcts_iter={mcts_iter}, num_particles={num_particles}, pso_iter={pso_iter}"
+        f"Running PSO with 1+1EA_iter=100, num_particles={num_particles}, pso_iter={pso_iter}"
     )
     # algorithm logic
-    pso = PSO(
-        rooms_range, num_particles=num_particles, max_iter=pso_iter, mcts_iter=mcts_iter
-    )
-    best_house = pso.optimize(boundary)
+    # pso = PSO(
+    #     rooms_range, num_particles=num_particles, max_iter=pso_iter, mcts_iter=mcts_iter
+    # )
+    # best_house = pso.optimize(boundary)
+
+    # 1+1 EA
+    size_one_one_EA = Size_OnePlusOneEA(boundary, rooms_range)
+    best_house, fitness = size_one_one_EA.search()
 
     # final check
     if len(best_house.rooms) < len(rooms_range):
