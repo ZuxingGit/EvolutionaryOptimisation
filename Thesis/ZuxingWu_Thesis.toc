@@ -1,0 +1,15 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{}%
+\contentsline {subsection}{\numberline {1.1}Aim}{3}{}%
+\contentsline {subsection}{\numberline {1.2}Motivation}{3}{}%
+\contentsline {section}{\numberline {2}Literature Review}{3}{}%
+\contentsline {section}{\numberline {3}Methodology}{5}{}%
+\contentsline {subsection}{\numberline {3.1}Population Initialization}{5}{}%
+\contentsline {subsection}{\numberline {3.2}Representation of Floor Plans}{5}{}%
+\contentsline {subsection}{\numberline {3.3}Evolutionary Optimization Framework}{5}{}%
+\contentsline {subsection}{\numberline {3.4}Fitness Function Design}{6}{}%
+\contentsline {section}{\numberline {4}Plan vs Progress}{7}{}%
+\contentsline {subsection}{\numberline {4.1}Research Plan}{7}{}%
+\contentsline {subsection}{\numberline {4.2}Progress}{9}{}%
+\contentsline {section}{\numberline {5}Experimental Results}{9}{}%
+\contentsline {section}{\numberline {6}Conclusion}{9}{}%
+\contentsline {section}{\numberline {7}Plagiarism Declaration}{10}{}%
