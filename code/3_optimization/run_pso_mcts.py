@@ -21,27 +21,28 @@ max_house_depth = 25
 # house_depth = random.randint(min_house_depth, max_house_depth)
 
 # set manually for now
-house_width = 16
-house_depth = 10
+house_width = 15
+house_depth = 8
 
 boundary = Polygon(
     [(0, 0), (house_width, 0), (house_width, house_depth), (0, house_depth)]
 )
 
 # The entry position
-entry = LineString([(0, 5), (0, 6)])
+entry = LineString([(0, 4), (0, 5)])
 
 
 # Define room types (type, min_width, max_width, min_depth, max_depth)
 rooms_range = [
     ("GAR", 5, 6, 3, 6),  # Garage
-    ("LDR", 2, 3, 2, 3),  # Laundry Room
+    ("LDR", 3, 3, 3, 3),  # Laundry Room
     ("DR", 3, 5, 3, 5),  # Dining Room
     ("LR", 3, 6, 3, 6),  # Living Room
-    ("KIC", 2, 4, 2, 4),  # Kitchen
+    ("KIC", 3, 4, 3, 4),  # Kitchen
     ("MBR", 3, 6, 3, 6),  # Master Bedroom
     ("BR1", 3, 5, 3, 5),  # Bedroom
     ("BA", 2, 4, 2, 4),  # Bathroom
+    # ("STR", 1, 2, 1, 2),  # Storage Room
     # ("BR2", 3, 5, 3, 5),  # Bedroom2
     # ("HW", 2, 10, 1, 2),  # Hallway
     # ("BAL", 2, 8, 1, 2),  # Balcony
@@ -1117,6 +1118,29 @@ def dis_MBR_KIC(house):
     return normalized_distance
 
 
+# 22. bigger_MBR +
+def bigger_MBR(house):
+    """
+    22. bigger MBR than BRs +\\
+    check if the master bedroom is bigger than other bedrooms. (0: no; 1: yes), 1 is preferred
+    """
+    MBR = None
+    BR = []
+    for room in house.rooms:
+        if room.name == "MBR":
+            MBR = room
+        if room.name.startswith("BR"):
+            BR.append(room)
+    if MBR is None or len(BR) == 0:
+        return 1
+
+    # check if the master bedroom is bigger than other bedrooms
+    for br in BR:
+        if MBR.width * MBR.depth < br.width * br.depth:
+            return 0
+    return 1
+
+
 def fitness_partial(house):
     """
     Partial Fitness function with overlap penalty & utilization rate. No window and door involved.
@@ -1124,14 +1148,18 @@ def fitness_partial(house):
     fitness = 0
     penalty = 0
     if check_GAR_side(house) == 0:
-        penalty += 0.5
+        penalty += 1
     if check_no_entry_touch(house) == 0:
         penalty += 0.5
+    if bigger_MBR(house) == 0:
+        penalty += 0.8
 
-    # Calculate fitness with special order
-    if (fitness := (1 - cal_overlap_rate(house))) < 1:
+    # Calculate fitness with special priority
+    if (fitness := diff_public_private(house)) < 1:
         return fitness - penalty
-    elif (fitness := fitness + utilization_rate(house)) < 1.75:
+    elif (fitness := (fitness + 1 - cal_overlap_rate(house))) < 2:
+        return fitness - penalty
+    elif (fitness := fitness + utilization_rate(house)) < 2.8:
         return fitness - penalty
     else:
         fitness += (
@@ -1146,12 +1174,13 @@ def fitness_partial(house):
             + (1 - dis_KIC_DR(house))
             + (1 - dis_LR_DR(house))
             # # + check_no_entry_touch(house)
-            + diff_public_private(house) * 15
+            # + diff_public_private(house) * 15
             + check_KIC_orientation(house) * 2
-            + (1 - dis_LDR_KIC(house))
-            + (1 - dis_GAR_KIC(house))
+            + 0.5 * (1 - dis_LDR_KIC(house))
+            + 0.5 * (1 - dis_GAR_KIC(house))
             + dis_MBR_LR(house)
             + dis_MBR_KIC(house)
+            + utilization_rate(house) * 8
         )
 
     # fitness += diff_public_private(house)
@@ -1263,11 +1292,18 @@ def save_snapshots(
     plt.grid(True, linestyle="--", alpha=0.2)
     plt.title(f"Fitness: {fitness}")
     # create target folder if not exists
-    if not os.path.exists(f"results/{starting_time}/{mcts_iter}_{num_par}_{pso_iter}"):
-        os.makedirs(f"results/{starting_time}/{mcts_iter}_{num_par}_{pso_iter}")
-    plt.savefig(
-        f"results/{starting_time}/{mcts_iter}_{num_par}_{pso_iter}/{iteration_count}.png"
-    )
+    if mcts_iter == 0 and num_par == 0 and pso_iter == 0:
+        if not os.path.exists(f"results/{starting_time}/1+1_EA"):
+            os.makedirs(f"results/{starting_time}/1+1_EA")
+        plt.savefig(f"results/{starting_time}/1+1_EA/{iteration_count}.png")
+    else:
+        if not os.path.exists(
+            f"results/{starting_time}/{mcts_iter}_{num_par}_{pso_iter}"
+        ):
+            os.makedirs(f"results/{starting_time}/{mcts_iter}_{num_par}_{pso_iter}")
+        plt.savefig(
+            f"results/{starting_time}/{mcts_iter}_{num_par}_{pso_iter}/{iteration_count}.png"
+        )
 
     plt.close()
 
@@ -1328,7 +1364,7 @@ class Position_OnePlusOneEA:
     1+1 EA algorithm for mutating room's position
     """
 
-    def __init__(self, boundary, rooms, max_iter=100):
+    def __init__(self, boundary, rooms, max_iter=300):
         self.boundary = boundary
         self.rooms = rooms
         self.max_iter = max_iter
@@ -1372,7 +1408,7 @@ class Position_OnePlusOneEA:
                 # Generate a mutation rate [0, 1]
                 mutation_rate = random.uniform(0, 1)
                 # Mutate this room if mutation_rate < 1/8
-                if mutation_rate <= 0.125:
+                if mutation_rate <= 0.05:
                     # Get the room type, width, and depth
                     room_type = room.name
                     width = room.width
@@ -1385,8 +1421,8 @@ class Position_OnePlusOneEA:
                         continue
                     # Get current index of position array
                     index = index_position_array[i]
-                    # Generate a random number [-50, 50]
-                    random_number = random.randint(-50, 50)
+                    # Generate a random number [-75, 75]
+                    random_number = random.randint(-150, 150)
                     # Get the new index of position array
                     new_index = (index + random_number) % len_legal_positions
                     # Get the new position of the room
@@ -1423,7 +1459,10 @@ class PSO:
         self.gbest_sizes = []
         self.gbest_layout = None
         self.mcts_iter = mcts_iter
-        self.full_fitness = -float("inf")
+        # self.full_fitness = -float("inf")
+        self.w_max = 0.78540
+        self.w_min = -0.16199
+        self.n = 1
 
         # Initialize particles
         self.particles = []
@@ -1497,25 +1536,23 @@ class PSO:
             # Update velocities and positions
             for particle in self.particles:
                 for i in range(len(particle["sizes"])):
-                    w = 0.5  # inertia
+                    # w = 0.5  # inertia
+                    ## 1. Non-linearly decreasing inertia weight (better than linear)
+                    # w = ((self.max_iter - _) / self.max_iter) ** self.n * (
+                    #     self.w_min - self.w_max
+                    # ) + self.w_max
+                    ## 2. Linearly decreasing inertia weight
+                    w = self.w_max - (_ / self.max_iter) * (self.w_max - self.w_min)
                     c1 = 0.4  # cognitive
                     c2 = 0.4  # social
 
                     v = [
                         w * particle["velocity"][i][0]
-                        + c1
-                        * random.random()
-                        * (particle["pbest_sizes"][i][0] - particle["sizes"][i][0])
-                        + c2
-                        * random.random()
-                        * (self.gbest_sizes[i][0] - particle["sizes"][i][0]),
+                        + c1 * (particle["pbest_sizes"][i][0] - particle["sizes"][i][0])
+                        + c2 * (self.gbest_sizes[i][0] - particle["sizes"][i][0]),
                         w * particle["velocity"][i][1]
-                        + c1
-                        * random.random()
-                        * (particle["pbest_sizes"][i][1] - particle["sizes"][i][1])
-                        + c2
-                        * random.random()
-                        * (self.gbest_sizes[i][1] - particle["sizes"][i][1]),
+                        + c1 * (particle["pbest_sizes"][i][1] - particle["sizes"][i][1])
+                        + c2 * (self.gbest_sizes[i][1] - particle["sizes"][i][1]),
                     ]
 
                     particle["velocity"][i] = v
@@ -1580,6 +1617,8 @@ class Size_OnePlusOneEA:
 
         # 1. randomly mutate room(s)' width and depth
         for i in range(self.max_iter):
+            # i = 0
+            # while self.best_fitness < 3.0:
             rooms = self.best_layout_rooms.copy()
             for j, room in enumerate(rooms):
                 # generate a mutation rate [0, 1]
@@ -1610,15 +1649,38 @@ class Size_OnePlusOneEA:
                     )
                     # Create a new room with the new size
                     new_room = (room_type, new_width, new_depth)
-                    # replace the room with the new size
+                    # replace the room with the new mutated room
                     rooms[j] = new_room
 
             # 2. put it into Position_OnePlusOneEA to get the best layout for current sizes
             one_one_EA = Position_OnePlusOneEA(self.boundary, rooms)
             best_layout, fitness = one_one_EA.search()
-            if fitness > self.best_fitness:
+
+            # Swap the position of random two rooms
+            swapped_layout = swap_2rooms(copy.deepcopy(best_layout))
+            swapped_fitness = fitness_partial(swapped_layout)
+
+            if fitness > self.best_fitness and fitness > swapped_fitness:
                 self.best_layout = best_layout
                 self.best_fitness = fitness
+                self.best_layout_rooms = rooms.copy()
+                # save snapshots every time better layout is found
+                # force the count number to be like: 0000, 0025, 0050, ...
+                save_snapshots(
+                    current_time,
+                    self.best_layout,
+                    str(i).zfill(4),
+                    self.best_fitness,
+                    0,
+                    0,
+                    0,
+                )
+                print(
+                    f"Iteration: {i}, Polygon Type: {self.best_layout.cluster.geom_type}, Fitness: {self.best_fitness}"
+                )
+            elif swapped_fitness > self.best_fitness and swapped_fitness > fitness:
+                self.best_layout = swapped_layout
+                self.best_fitness = swapped_fitness
                 self.best_layout_rooms = rooms.copy()
                 # save snapshots every time better layout is found
                 # force the count number to be like: 0000, 0025, 0050, ...
@@ -1648,6 +1710,7 @@ class Size_OnePlusOneEA:
                 print(
                     f"Iteration: {i}, Polygon Type: {self.best_layout.cluster.geom_type}, Fitness: {self.best_fitness}"
                 )
+            i += 1
 
         return self.best_layout, self.best_fitness
 
@@ -1669,14 +1732,23 @@ configurations = [
 
 def run_pso_mcts(mcts_iter, num_particles, pso_iter):
     print(
-        f"Running PSO with 1+1EA_iter=100, num_particles={num_particles}, pso_iter={pso_iter}"
+        f"Running PSO with mcts_iter={mcts_iter} , num_particles={num_particles}, pso_iter={pso_iter}"
     )
     # algorithm logic
-    # pso = PSO(
-    #     rooms_range, num_particles=num_particles, max_iter=pso_iter, mcts_iter=mcts_iter
-    # )
-    # best_house = pso.optimize(boundary)
+    pso = PSO(
+        rooms_range, num_particles=num_particles, max_iter=pso_iter, mcts_iter=mcts_iter
+    )
+    best_house = pso.optimize(boundary)
 
+    # final check
+    if len(best_house.rooms) < len(rooms_range):
+        print("Failed to place all rooms")
+
+    return best_house
+
+
+def run_1_plus_1_EA():
+    print("Running 1+1 EA")
     # 1+1 EA
     size_one_one_EA = Size_OnePlusOneEA(boundary, rooms_range)
     best_house, fitness = size_one_one_EA.search()
@@ -1691,7 +1763,8 @@ def run_pso_mcts(mcts_iter, num_particles, pso_iter):
 # Function to run a single configuration
 def run_config(config):
     mcts_iter, particles, pso_iter = config
-    run_pso_mcts(mcts_iter, particles, pso_iter)
+    # run_pso_mcts(mcts_iter, particles, pso_iter)
+    run_1_plus_1_EA()
 
 
 # Use multiprocessing to run configurations in parallel
