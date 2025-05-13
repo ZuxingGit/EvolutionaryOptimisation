@@ -1,0 +1,59 @@
+\begin{thebibliography}{1}
+
+\bibitem{10.1007/11732242_56}
+A.~M. Brintrup, H.~Takagi, and J.~Ramsden.
+\newblock Evaluation of sequential, multi-objective, and parallel interactive
+  genetic algorithms for multi-objective floor plan optimisation.
+\newblock In F.~Rothlauf, J.~Branke, S.~Cagnoni, E.~Costa, C.~Cotta,
+  R.~Drechsler, E.~Lutton, P.~Machado, J.~H. Moore, J.~Romero, G.~D. Smith,
+  G.~Squillero, and H.~Takagi, editors, {\em Applications of Evolutionary
+  Computing}, pages 586--598, Berlin, Heidelberg, 2006. Springer Berlin
+  Heidelberg.
+
+\bibitem{CHAICHI2024108842}
+B.~Chaichi and A.~{Andaji Garmaroodi}.
+\newblock Multi-objective optimization of a residential zone by proposing
+  appropriate comfort factors using none dominated sorting genetic algorithm.
+\newblock {\em Journal of Building Engineering}, 86:108842, 2024.
+
+\bibitem{7844659}
+A.~de~Almeida, B.~Taborda, F.~Santos, K.~Kwiecinski, and S.~Eloy.
+\newblock A genetic algorithm application for automatic layout design of
+  modular residential homes.
+\newblock In {\em 2016 IEEE International Conference on Systems, Man, and
+  Cybernetics (SMC)}, pages 002774--002778, 2016.
+
+\bibitem{doi:10.1177/1478077119832982}
+M.~Nisztuk and P.~B. Myszkowski.
+\newblock Hybrid evolutionary algorithm applied to automated floor plan
+  generation.
+\newblock {\em International Journal of Architectural Computing},
+  17(3):260--283, 2019.
+
+\bibitem{9675541}
+R.~Subramanian, T.~DheenaDayalan, T.~Badhrirajan, C.~Dhinakaran,
+  C.~Devakirubai, and R.~R. Sudharsan.
+\newblock An automated house plan generator leveraging genetic algorithms.
+\newblock In {\em 2021 International Conference on Advancements in Electrical,
+  Electronics, Communication, Computing and Automation (ICAECA)}, pages 1--6,
+  2021.
+
+\bibitem{WANG20051329}
+L.~Wang.
+\newblock A hybrid genetic algorithm–neural network strategy for simulation
+  optimization.
+\newblock {\em Applied Mathematics and Computation}, 170(2):1329--1343, 2005.
+
+\bibitem{WANG2023100238}
+T.-K. Wang and W.~Duan.
+\newblock Generative design of floor plans of multi-unit residential buildings
+  based on consumer satisfaction and energy performance.
+\newblock {\em Developments in the Built Environment}, 16:100238, 2023.
+
+\bibitem{YAN2024110546}
+S.~Yan and N.~Liu.
+\newblock Computational design of residential units’ floor layout: A
+  heuristic algorithm.
+\newblock {\em Journal of Building Engineering}, 96:110546, 2024.
+
+\end{thebibliography}

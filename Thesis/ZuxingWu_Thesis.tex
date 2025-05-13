@@ -67,7 +67,7 @@ Residential floor plan design is a complex and challenging task that requires ca
 \subsection{Motivation}
 Residential floor plan design is a critical aspect of architectural design that involves the layout of rooms, corridors, and other spaces within a building. The design of a floor plan can have a significant impact on the functionality, convenience, comfort, ventilation and energy efficiency of a building. Traditional methods of floor plan design are often based on manual sketches or computer-aided design (CAD) tools, which can be time-consuming and labor-intensive. Moreover, these methods may not always produce optimal solutions, as they rely on the intuition and experience of the designer.
 
-Evolutionary algorithms have been proposed as a promising alternative for optimizing floor plans, as they can efficiently explore the design space and generate high-quality solutions. Evolutionary algorithms are a class of optimization algorithms inspired by the process of natural selection. They work by maintaining a population of candidate solutions (individuals) and iteratively applying genetic operators (e.g.\ crossover, mutation) to generate new solutions. The fitness of each solution is evaluated based on a predefined fitness functions, which measure how well the solution satisfies the objectives of the optimization problems.
+Evolutionary algorithms have been proposed as a promising alternative for optimizing floor plans, as they can efficiently explore the design space and generate high-quality solutions. Evolutionary algorithms are a class of optimization algorithms inspired by the process of natural selection. They work by maintaining a population of candidate solutions (individuals) and iteratively applying genetic operators (e.g.,\ crossover, mutation) to generate new solutions. The fitness of each solution is evaluated based on predefined fitness functions, which measure how well the solution satisfies the objectives of the optimization problems.
 
 \section{Literature Review}
 Previous research has explored the application of evolutionary algorithms to optimize residential floor plans. Brintrup et al.~\cite{10.1007/11732242_56} compared three interactive genetic algorithms (i.e., sequential IGA, multi-objective IGA, parallel IGA) on a multi-objective floor planning task, and found that the multi-objective IGA provides more diverse results and faster convergence for optimizing floor plans. They developed interactive evolutionary algorithms that allow designers to incorporate their preferences and constraints into the optimization process. This method has shown promising results in generating floor plans that meet both functional and aesthetic requirements.
@@ -132,20 +132,20 @@ The proposed method will be implemented in Python. The optimization process will
 
 \section{Plan vs Progress}
 \subsection{Research Plan}
-My research plan consists of four main phases at the beginning:
+My research plan consists of four main phases at the end of the last semester:
 \begin{itemize}
     \item Phase 1
           \begin{enumerate}
-              \item Population initialization
               \item Solution representation
+              \item Solution evaluation
           \end{enumerate}
     \item Phase 2
           \begin{enumerate}
               \item Evolutionary optimization
-              \item Solution evaluation
+              \item Population initialization
           \end{enumerate}
 \end{itemize}
-Each phase involves specific tasks and activities that will be carried out over a period of 6 months. The timeline for the research plan is shown in the Gantt chart below. \\
+Each phase involves specific tasks and activities that will be carried out over a period of 6 months (since I did not make a plan for semester 1 of this year). The timeline for the research plan, at that time, is shown in the Gantt chart below. \\
 \begin{ganttchart}[
         hgrid,
         vgrid,
@@ -168,69 +168,112 @@ Each phase involves specific tasks and activities that will be carried out over 
     \gantttitle{2024.09--2025.02}{6} \\
     \gantttitlelist{9,10,11,12,1,2}{1} \\
     \ganttgroup{Phase 1}{1}{3} \\
-    \ganttbar{Initialization}{1}{2} \\
-    \ganttbar{Representation}{2}{3} \\
-    \ganttgroup{Phase 2}{4}{6} \\
-    \ganttbar{Optimization}{4}{5} \\
-    \ganttbar{Evaluation}{5}{6}
-    \gantttitle{Original Research Plan Timeline}{6} \\
-\end{ganttchart}
-
-However, the research plan has been adjusted according to the progress of the research. My supervisor and I both agree that the research plan should be adjusted to focus on the solution representation and solution evaluation first, and then move on to the evolutionary optimization and population initialization. The new research plan is shown in the Gantt chart below. \\
-\begin{ganttchart}[
-        hgrid,
-        vgrid,
-        x unit = 1.4cm,
-        y unit chart=0.7cm,
-        title/.append style={fill=none},
-        title label font=\bfseries\footnotesize,
-        title label anchor/.append style={below=-1.6ex},
-        include title in canvas=false,
-        bar label font=\normalsize\scshape,
-        bar label node/.append style={left=2ex},
-        bar/.append style={fill=yellow!60},
-        group/.append style={fill=cyan!80},
-        bar incomplete/.append style={fill=red!30},
-        progress label text={},
-        group right shift=0,
-        group top shift=0.7,
-        group height=.3
-    ]{1}{6}
-    \gantttitle{2024.09--2025.02}{6} \\
-    \gantttitlelist{9,10,11,12,1,2}{1} \\
-    \ganttgroup{Phase 1}{1}{3} \\
-    \ganttbar[bar/.append style={fill=green!60}]{Representation}{1}{2} \\
-    \ganttbar[bar/.append style={fill=green!60}]{Evaluation}{2}{3} \\
+    \ganttbar{Representation}{1}{2} \\
+    \ganttbar{Evaluation}{2}{3} \\
     \ganttgroup{Phase 2}{4}{6} \\
     \ganttbar{Optimization}{4}{5} \\
     \ganttbar{Initialization}{5}{6}
-    \gantttitle{Current Research Plan Timeline}{6} \\
+    \gantttitle{Last Semester Research Plan Timeline}{6} \\
+\end{ganttchart}
+
+However, the real research progress did not go as planned. The research plan was adjusted to focus on the solution evaluation and evolutionary optimization. The solution evaluation is the key to the quality of generated floor plans, and the evolutionary optimization is the core of this research. The solution representation is the prerequisite of solution evaluation. The population initialization can be adjusted according to the progress of the research. The true timeline for the research progress is shown in the Gantt chart below. \\
+\begin{ganttchart}[
+        hgrid,
+        vgrid,
+        x unit = 1.0cm,
+        y unit chart=0.7cm,
+        title/.append style={fill=none},
+        title label font=\bfseries\footnotesize,
+        title label anchor/.append style={below=-1.6ex},
+        include title in canvas=false,
+        bar label font=\normalsize\scshape,
+        bar label node/.append style={left=0.1ex},
+        bar/.append style={fill=yellow!60},
+        group/.append style={fill=cyan!80},
+        bar incomplete/.append style={fill=red!30},
+        progress label text={},
+        group right shift=0,
+        group top shift=0.7,
+        group height=.3
+    ]{1}{9}
+    \gantttitle{2024.09--2025.05}{9} \\
+    \gantttitlelist{9,10,11,12,1,2}{1}
+    \gantttitlelist[title/.append style={fill=red!55}]{3,4,5}{1} \\
+    \ganttgroup{Phase 1}{1}{3} \\
+    \ganttbar{Representation}{1}{2} \\
+    \ganttbar[bar/.append style={fill=brown!60}]{Evaluation}{2}{9} \\
+    \ganttgroup{Phase 2}{4}{9} \\
+    \ganttbar[bar/.append style={fill=brown!60}]{Optimization}{4}{9} \\
+    \ganttbar{Initialization}{4}{7}
+    \gantttitle{Real Research Progress}{9} \\
 \end{ganttchart}
 
 
 \subsection{Progress}
-It can be seen from the Gantt chart above that the research plan has been adjusted to focus on the solution representation and solution evaluation first, and then move on to the evolutionary optimization and population initialization. It makes sense to focus on the solution representation and solution evaluation first, as solution representation is the prerequisite of solution evaluation, and the solution evaluation is the key to the success of the research. The evolutionary optimization and population initialization can be adjusted according to the progress of the research.
+It can be seen from the Gantt chart above that the research process has been adjusted to mainly focus on the solution evaluation and evolutionary optimization.
 
-From the start of the project, I have completed the following tasks: 1. Solution representation, 2. Most of the solution evaluation functions. The solution representation is based on the Python class, which encodes the spatial information of rooms, such as vertexes, doors, windows, and adjacent rooms.
-The solution evaluation is based on the evaluation indicators shown in Table~\ref{table1}. The fitness function is designed to assess each floor plan based on several criteria: privacy, comfort, practicality, and convenience. It includes 11 evaluation indicators from Wang et al.~\cite{WANG2023100238} research and 1 self-made indicator that are used to calculate the fitness of each floor plan.
+Last summer holiday, I have completed the solution representation and solution evaluation, respectively using self-defined classes to represent the floor plan and using a set of fitness functions to evaluate each floor plan. All the fitness values are calculated and normalized to a range of 0 to 1.
 
-All fitness values calculated from these indicators are normalized to the range of [0, 1] and then combined to form the final fitness value. The Min-Max normalization method is used to normalize the fitness values. The Min-Max normalization equation is defined as:
+Fitness functions are designed to evaluate the quality of the generated floor plans based on various criteria, such as privacy, comfort, practicality, and convenience. The evaluation process involves calculating the fitness values for each floor plan in the population and selecting the best individuals for particles updating their velocity and position in PSO.
+
+\subsubsection{PSO algorithm + MCTS algorithm}
+From the start of semester 1 of 2025, I have been working on the evolutionary optimization process. Initially, I focused on the PSO algorithm, which is suitable for optimizing the size of rooms due to parallel processing, and MCTS algorithm, which handles discrete variables (i.e., room position). I had implemented the PSO algorithm and MCTS algorithm in Python, and I tried integrating them into a single framework. The integration process involves combining the two algorithms to create a hybrid optimization approach that can effectively handle both continuous and discrete variables in the floor plan design process.
+
+\subsubsection{MCTS algorithm replaced by (1+1) EA}
+However, the integration process has proven to be more complex than anticipated, and the MCTS algorithm did not optimize the room position very well. Therefore, I changed it to a simple greedy algorithm called (1+1) Evolutionary Algorithm, which is a simple evolutionary algorithm that maintains a single individual and applies mutation to generate new individuals. The (1+1) EA algorithm is easier to implement and can be used to optimize the room position (i.e., the (x, y) coordinates) in the floor plan design process. If the new solution has a better fitness value, it replaces the current solution. This process continues until a termination criterion, such as a maximum number of iterations or a satisfactory fitness value, is met. It is a simple yet effective optimization algorithm that can be used to improve the quality of the generated floor plans, especially in terms of room position.
+
+\subsubsection{Tune inertia weight}
+In the PSO algorithm, the inertia weight plays a crucial role in balancing exploration and exploitation. Initially, I implemented a linearly decreasing inertia weight, which reduces the inertia weight from a maximum value to a minimum value over the course of iterations. However, after conducting experiments, I found that a non-linearly decreasing inertia weight performs better in terms of convergence speed and solution quality.
+
+The non-linearly decreasing inertia weight is defined as:
 \begin{equation*}
-    X_{\text{normalized}} = \frac{X - X_{\text{min}}}{X_{\text{max}} - X_{\text{min}}}
+    w(t) = w_{\text{max}} + (w_{\text{min}} - w_{\text{max}}) \cdot \left(1 - \frac{t}{T}\right)^n
 \end{equation*}
-where $X$ is the original value, $X_{\text{min}}$ and $X_{\text{max}}$ are the minimum and maximum values of the evaluation indicator, respectively.
+where $w(t)$ is the inertia weight at iteration $t$, $w_{\text{max}}$ and $w_{\text{min}}$ are the maximum and minimum inertia weights, $T$ is the total number of iterations, and $t$ is the current iteration. $t$ is the nonlinear modulation index in the range of [0.9, 1.3].
+
+This non-linear decrease allows the algorithm to explore the search space more effectively in the early stages and focus on exploitation in the later stages. The quadratic term ensures a smoother transition, which helps in avoiding premature convergence and improves the overall performance of the optimization process.
+
+\subsubsection{PSO algorithm replaced by (1+1) EA}
+After that, we found that the PSO algorithm is not suitable for optimizing the size of rooms, because the room size is set discrete by my code and the PSO algorithm is designed for continuous optimization problems. Therefore, I changed it to (1+1) EA too, so that the room size (i.e., width and depth) can be optimized in a similar way to the room position mutation. The (1+1) EA algorithm will randomly select a room in the floor plan and generate a new room size by adding a small random perturbation to the current size. The new room size will be evaluated using the fitness functions, and if it results in a better fitness value, it will replace the current best room size. This process continues until all rooms have been assigned their optimal sizes.
+
+\subsubsection{Swap two random rooms}
+Through the above processes, swap mutation is used to optimize the room position. The swap mutation involves selecting two random rooms in the floor plan and swapping their positions. The swap mutation is a simple yet effective way to explore the design space and generate new floor plans. The new floor plans are evaluated using the fitness functions, and if they result in better fitness values, they will replace the current best floor plan.
+
+\subsubsection{Prioritized fitness calculation}
+To improve the performance of the optimization process, a prioritized fitness calculation strategy has been adopted. This strategy evaluates the fitness of floor plans based on the priority of the criteria, starting with the most important and moving to the less important ones. The prioritized fitness calculation process is outlined as follows:
+
+\begin{enumerate}
+    \item \textbf{Define Priorities:} Assign a priority level to each criterion (e.g., privacy, practicality, comfort, convenience). Higher priority criteria are evaluated first.
+    \item \textbf{Sequential Evaluation:} Calculate the fitness values for each criterion in the order of their priority. For example, privacy is evaluated before practicality.
+    \item \textbf{Weighted Aggregation:} Combine the fitness values using a weighted sum, where the weights correspond to the significance levels. The overall fitness value is given by:
+          \begin{equation*}
+              \text{Fitness}_{\text{total}} = \sum_{i=1}^{n} w_i \cdot \text{Fitness}_i
+          \end{equation*}
+          where $w_i$ is the weight for criterion $i$, and $\text{Fitness}_i$ is the fitness value for criterion $i$.
+    \item \textbf{Early Termination:} If a floor plan fails to meet the minimum threshold for a high-priority criterion, it is discarded without evaluating the lower-priority criteria. This reduces unnecessary computations.
+\end{enumerate}
+
+This strategy ensures that the optimization process focuses on the most critical aspects of the floor plan design, improving both efficiency and the quality of the solution generation.
+This approach allows for a more efficient evaluation process and helps to focus on the most critical aspects of the floor plan design, since it avoids unnecessary calculations in the early stages.
+
+\subsubsection{Remove windows and doors}
+In the previous version of the code, the windows and doors were added to each room immediately after the floor plan was generated. However, this approach led to a significant increase in the complexity of the optimization process, as the presence of windows and doors added additional constraints to the design. As a result, the optimization process became slower and less efficient, and the overall quality of the generated floor plans was not satisfactory even after multiple iterations.
+To address this issue, I have removed the windows and doors from the early generation process. Instead, the optimization process will focus on generating the basic layout of the floor plan, including room sizes, positions, and an entry, without any additional features. Once the optimization process is completed and a satisfactory floor plan has been generated, windows and doors will be added to the final design. This approach simplifies the optimization process and allows for more efficient exploration of the design space.
+
+\subsubsection{Change land size and orientation}
+In the initial version of the code, the land size and orientation were fixed, which limited the flexibility of the design process. To enhance the adaptability of the floor plan generation, I have modified the code to allow for variable land sizes and orientations. This change enables the optimization process to spot potential problems and explore a wider range of design possibilities, accommodating different land configurations and orientations. The new approach allows for more diverse and flexible floor plan designs, making it easier to meet the needs and preferences of specific users.
+
+\subsubsection{Dotted line for open space}
+In the earlier design phase, the open space in the floor plan was represented by a solid line, which made it difficult to distinguish between open space and closed rooms. To improve the clarity of the design, I have changed the representation of open space to dotted lines. This change allows for a clearer visualization of the floor plan, making it easier to identify open spaces and their relationships with other rooms in the house.
+
+\subsubsection{Tune weights}
+To get satisfying floor plans, I keep tuning the weights of the fitness functions. The weights are used to balance the importance of different criteria in the evaluation process. By adjusting the weights, I can prioritize certain aspects of the design, such as low overlap or high utilization rate, to achieve better overall results. This tuning process is iterative and may require multiple rounds of testing and evaluation to find the optimal balance for the specific design goals.
 
 \section{Experimental Results}
 
 
 \section{Conclusion}
-In this project, Particle Swarm Optimization (PSO) is applied to the entire evolutionary optimization process for floor plan design. This approach is aimed at developing an efficient, user-friendly workflow that optimizes spatial layouts while meeting functional and aesthetic requirements. With PSO as the foundation, the goal is to complete the floor plan optimization process by implementing an adaptive, automated pipeline capable of producing high-quality layouts that align with user needs.
 
-To ensure a smooth workflow, each component of the system will be tested rigorously for both efficiency and usability. Initial testing will focus on the system’s ability to generate optimized layouts within a feasible time frame. Any bottlenecks identified during testing will prompt optimizations to increase processing speed, ensuring the final system performs efficiently in a real-world setting. This will involve streamlining the PSO configuration and refining the interaction between components, as well as incorporating caching or faster algorithms where necessary to handle larger floor plans.
-
-One additional aspect of this project is to generate vivid, detailed floor plans, including features such as furniture placement, texture suggestions, and enhanced visualizations to assist both designers and end-users in better understanding and interacting with the layouts. By incorporating these visual elements, the system aims to produce floor plans that are both functionally optimized and visually appealing, which can be valuable for designers as well as clients.
-
-Moreover, the project will explore integration with AI models to further enhance the system’s capabilities. By using AI, the floor plan generation process can be augmented to suggest or adapt layouts based on user preferences or trends in design, making it a more versatile tool for various applications. This integration would also involve machine learning techniques that learn from user feedback to iteratively improve the generated layouts, aligning them more closely with client needs over time.
 
 \section{Plagiarism Declaration}
 I hereby declare that this submission is my own work and to the best of my knowledge, it contains no material previously published or written by another person, except where due to acknowledgment is made. Furthermore, I believe that it contains no material which has been accepted for the award of other degree or diploma in any university or other tertiary institutions.

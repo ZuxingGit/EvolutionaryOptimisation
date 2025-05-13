@@ -10,6 +10,17 @@
 \contentsline {section}{\numberline {4}Plan vs Progress}{7}{}%
 \contentsline {subsection}{\numberline {4.1}Research Plan}{7}{}%
 \contentsline {subsection}{\numberline {4.2}Progress}{9}{}%
-\contentsline {section}{\numberline {5}Experimental Results}{9}{}%
-\contentsline {section}{\numberline {6}Conclusion}{9}{}%
-\contentsline {section}{\numberline {7}Plagiarism Declaration}{10}{}%
+\contentsline {subsubsection}{\numberline {4.2.1}PSO algorithm + MCTS algorithm}{9}{}%
+\contentsline {subsubsection}{\numberline {4.2.2}MCTS algorithm replaced by (1+1) EA}{9}{}%
+\contentsline {subsubsection}{\numberline {4.2.3}Tune inertia weight}{9}{}%
+\contentsline {subsubsection}{\numberline {4.2.4}PSO algorithm replaced by (1+1) EA}{10}{}%
+\contentsline {subsubsection}{\numberline {4.2.5}Swap two random rooms}{10}{}%
+\contentsline {subsubsection}{\numberline {4.2.6}Prioritized fitness calculation}{10}{}%
+\contentsline {subsubsection}{\numberline {4.2.7}Remove windows and doors}{11}{}%
+\contentsline {subsubsection}{\numberline {4.2.8}Change land size and orientation}{11}{}%
+\contentsline {subsubsection}{\numberline {4.2.9}Dotted line for open space}{12}{}%
+\contentsline {subsubsection}{\numberline {4.2.10}Tune weights}{12}{}%
+\contentsline {section}{\numberline {5}Experimental Results}{12}{}%
+\contentsline {section}{\numberline {6}Conclusion}{12}{}%
+\contentsline {section}{\numberline {7}Plagiarism Declaration}{12}{}%
+\contentsline {section}{\numberline {8}References}{12}{}%
