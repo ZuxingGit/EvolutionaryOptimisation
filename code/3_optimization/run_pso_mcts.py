@@ -9,6 +9,7 @@ import os
 import math
 from datetime import datetime
 import copy
+import time  # Import time module for timing
 
 # Land boundary
 min_house_width = 6
@@ -1358,7 +1359,510 @@ def swap_2rooms(layout):
     return layout
 
 
-# 1+1 EA algorithm
+# MCTS Node
+class MCTSNode:
+    def __init__(self, state, parent=None, action=None):
+        self.state = state
+        self.parent = parent
+        self.action = action
+        self.children = []
+        self.visits = 0
+        self.value = 0
+        self.untried_actions = state.get_legal_actions()
+
+
+# Layout State
+class LayoutState:
+    def __init__(self, boundary, rooms):
+        self.boundary = boundary
+        self.rooms = rooms
+        self.current_room = 0
+        self.placed_rooms = []
+        self.cluster = None
+
+    def copy(self):
+        """Create a deep copy of the state."""
+        new_state = LayoutState(self.boundary, self.rooms)
+        new_state.current_room = self.current_room
+        new_state.placed_rooms = self.placed_rooms.copy()
+        new_state.cluster = self.cluster
+        return new_state
+
+    def get_legal_actions(self):
+        if self.current_room >= len(self.rooms):
+            return []
+
+        room_type, width, depth = self.rooms[self.current_room]
+        legal_positions = []
+        # Generate all possible positions as integers
+        x_positions = range(0, int(self.boundary.bounds[2] - width) + 1)
+        y_positions = range(0, int(self.boundary.bounds[3] - depth) + 1)
+        legal_positions = [(x, y) for x in x_positions for y in y_positions]
+
+        """
+        # if cluster is None, all positions are legal
+        if self.cluster is None:
+            # Generate all legal positions directly without checking the cluster
+            x_positions = np.arange(
+                0, self.boundary.bounds[2] - width, granularity_position
+            )
+            y_positions = np.arange(
+                0, self.boundary.bounds[3] - depth, granularity_position
+            )
+            legal_positions = [(x, y) for x in x_positions for y in y_positions]
+        # if cluster is not None, only positions that not in the cluster are legal
+        else:
+            # Use vectorized operations to filter positions outside the cluster
+            x_positions = np.arange(
+                0, self.boundary.bounds[2] - width, granularity_position
+            )
+            y_positions = np.arange(
+                0, self.boundary.bounds[3] - depth, granularity_position
+            )
+            x_grid, y_grid = np.meshgrid(x_positions, y_positions)
+            positions = np.column_stack((x_grid.ravel(), y_grid.ravel()))
+
+            # Filter positions using Shapely's `contains` and `within` methods
+            legal_positions = [
+                (x, y)
+                for x, y in positions
+                if not (
+                    Point(x, y).within(self.cluster)
+                    or Point(x + width, y + depth).within(self.cluster)
+                    or Point(x + width, y).within(self.cluster)
+                    or Point(x, y + depth).within(self.cluster)
+                )
+            ]
+"""
+        # print("Legal positions:", len(legal_positions))
+        return legal_positions
+
+    def place_room(self, position):
+        x, y = position
+        room_type, width, depth = self.rooms[self.current_room]
+        new_room = Room(room_type, width, depth, x, y)
+
+        # Add buffer to handle geometric issues
+        try:
+            new_poly = new_room.get_polygon().buffer(0)
+            if self.cluster:
+                combined = self.cluster.buffer(0).union(new_poly)
+                if not combined.is_valid:
+                    return False
+                self.cluster = combined
+            else:
+                self.cluster = new_poly
+
+            self.placed_rooms.append(new_room)
+            self.current_room += 1
+            return True
+        except Exception:
+            return False
+
+    def all_placed(self):
+        """Check if all rooms have been placed."""
+        return self.current_room >= len(self.rooms)
+
+    def get_house(self):
+        """Create a House object from the current state."""
+        # print("Placed--rooms:", len(self.placed_rooms))
+        return House(self.placed_rooms, self.boundary)
+
+
+# MCTS algorithm
+class MCTS:
+    def __init__(self, boundary, rooms, iterations=mcts_iter, exploration=1.414):
+        self.boundary = boundary
+        self.rooms = rooms
+        self.iterations = iterations
+        self.exploration = exploration
+
+    def search(self):
+        root_state = LayoutState(self.boundary, self.rooms)
+        root_node = MCTSNode(root_state)
+        best_reward = -float("inf")
+        best_state = None
+
+        for _ in range(self.iterations):
+            node = root_node
+            state = root_state.copy()
+            valid_simulation = True
+
+            # Selection with validity check
+            while node.untried_actions == [] and node.children != []:
+                # print("Selecting child")
+                node = self.select_child(node)
+                if not state.place_room(node.action):
+                    valid_simulation = False
+                    break
+
+            if not valid_simulation:
+                continue  # Skip invalid paths
+
+            # Expansion with smart action selection
+            if node.untried_actions:
+                action = random.choice(node.untried_actions)
+                # print("Expanding with action")
+                if state.place_room(action):
+                    node.untried_actions.remove(action)
+                    new_node = MCTSNode(state.copy(), node, action)
+                    node.children.append(new_node)
+                    node = new_node
+
+            # Enhanced simulation with retry mechanism
+            simulation_state = state.copy()
+            max_attempts = 100
+            attempts = 0
+            while not simulation_state.all_placed() and attempts < max_attempts:
+                legal_actions = simulation_state.get_legal_actions()
+                if not legal_actions:
+                    valid_simulation = False
+                    break
+                action = random.choice(legal_actions)
+                if not simulation_state.place_room(action):
+                    valid_simulation = False
+                    break
+                # print("Correct place?:", simulation_state.place_room(action))
+
+                attempts += 1
+
+            # Reward calculation
+            if not valid_simulation:
+                reward = 0.0
+            elif simulation_state.all_placed():
+                house = simulation_state.get_house()
+                # house.generate_doors_windows()  # Generate windows and doors for fitness calculation
+                reward = fitness_partial(house)
+
+                # Persist the generated windows and doors in the simulation state
+                simulation_state.placed_rooms = (
+                    house.rooms
+                )  # Update rooms with windows and doors
+                simulation_state.cluster = house.cluster  # Update the cluster
+
+                if reward > best_reward:
+                    best_reward = reward
+                    best_state = simulation_state
+
+            # Backpropagation
+            current_node = node
+            while current_node is not None:
+                current_node.visits += 1
+                current_node.value += reward
+                current_node = current_node.parent
+
+        # print("Reward:", reward)
+        # # print("node.visits:", root_node.visits)
+        # print("node.children:", len(root_node.children))
+        # # print("node.action:", node.action)
+        # return self.get_best_layout(root_node.children)
+        if best_state:
+            return best_state.get_house()
+        else:
+            return self.get_best_layout(root_node.children)
+
+    def select_child(self, node):
+        log_total = math.log(node.visits)
+        best_score = -float("inf")
+        best_child = None
+
+        for child in node.children:
+            score = child.value / child.visits + self.exploration * math.sqrt(
+                log_total / child.visits
+            )
+            if score > best_score:
+                best_score = score
+                best_child = child
+
+        return best_child
+
+    def get_best_layout(self, children):
+        best_value = -float("inf")
+        best_node = None
+        for child in children:
+            if child.visits > best_value:
+                best_value = child.visits
+                best_node = child
+        return best_node.state.get_house()
+
+
+# PSO & MCTS algorithm
+# class PSO_MCTS:
+class PSO_MCTS:
+    def __init__(self, rooms_range, num_particles, max_iter, mcts_iter):
+        self.rooms_range = rooms_range
+        self.num_particles = num_particles
+        self.max_iter = max_iter
+        self.gbest_fitness = -float("inf")
+        self.gbest_sizes = []
+        self.gbest_layout = None
+        self.mcts_iter = mcts_iter
+        self.w_max = 0.78540
+        self.w_min = -0.16199
+        self.n = 1
+        self.fitness_history = []  # List to store fitness values
+
+        # Initialize particles
+        self.particles = []
+        for _ in range(num_particles):
+            particle = {
+                "sizes": [self.random_size(room) for room in rooms_range],
+                "velocity": [[0, 0] for _ in rooms_range],
+                "pbest_fitness": -float("inf"),
+                "pbest_sizes": [],
+            }
+            self.particles.append(particle)
+
+    def random_size(self, room):
+        min_w, max_w, min_d, max_d = room[1:]
+        return [
+            random.randint(int(min_w), int(max_w)),  # Ensure width is an integer
+            random.randint(int(min_d), int(max_d)),  # Ensure depth is an integer
+        ]
+
+    def optimize(self, boundary):
+        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+        print(f"PSO_MCTS started at {current_time}")
+        for _ in range(self.max_iter):
+            is_gbest_updated = False
+            # Evaluate fitness for each particle
+            for index, particle in enumerate(self.particles):
+                # Evaluate fitness using MCTS
+                rooms = []
+                for i, size in enumerate(particle["sizes"]):
+                    rooms.append((self.rooms_range[i][0], size[0], size[1]))
+
+                mcts = MCTS(boundary, rooms)
+                best_layout = mcts.search()
+                fitness = fitness_partial(best_layout)
+                # one_one_EA = Position_OnePlusOneEA(boundary, rooms)
+                # best_layout, fitness = one_one_EA.search()
+
+                # Update personal best
+                if fitness > particle["pbest_fitness"]:
+                    particle["pbest_fitness"] = fitness
+                    particle["pbest_sizes"] = particle["sizes"].copy()
+
+                # Update global best
+                if fitness > self.gbest_fitness:
+                    self.gbest_fitness = fitness
+                    self.gbest_sizes = particle["sizes"].copy()
+                    self.gbest_layout = best_layout
+                    is_gbest_updated = True
+
+            # Local search: swap the position of random two rooms
+            swaped_layout = swap_2rooms(copy.deepcopy(self.gbest_layout))
+            swaped_fitness = fitness_partial(swaped_layout)
+            if swaped_fitness > self.gbest_fitness:
+                self.gbest_layout = swaped_layout
+                self.gbest_fitness = swaped_fitness
+                is_gbest_updated = True
+
+            # Record fitness value
+            self.fitness_history.append(self.gbest_fitness)
+
+            if is_gbest_updated:
+                print(
+                    f"PSO_MCTS Iteration {_} finished at: {datetime.now().strftime('%Y%m%d-%H%M%S')}, Fitness: {self.gbest_fitness}"
+                )
+
+            # Update velocities and positions
+            for particle in self.particles:
+                for i in range(len(particle["sizes"])):
+                    # w = 0.5  # inertia
+                    ## 1. Non-linearly decreasing inertia weight (better than linear)
+                    # w = ((self.max_iter - _) / self.max_iter) ** self.n * (
+                    #     self.w_min - self.w_max
+                    # ) + self.w_max
+                    ## 2. Linearly decreasing inertia weight
+                    w = self.w_max - (_ / self.max_iter) * (self.w_max - self.w_min)
+                    c1 = 0.4  # cognitive
+                    c2 = 0.4  # social
+
+                    v = [
+                        w * particle["velocity"][i][0]
+                        + c1 * (particle["pbest_sizes"][i][0] - particle["sizes"][i][0])
+                        + c2 * (self.gbest_sizes[i][0] - particle["sizes"][i][0]),
+                        w * particle["velocity"][i][1]
+                        + c1 * (particle["pbest_sizes"][i][1] - particle["sizes"][i][1])
+                        + c2 * (self.gbest_sizes[i][1] - particle["sizes"][i][1]),
+                    ]
+
+                    particle["velocity"][i] = v
+                    particle["sizes"][i] = [
+                        max(
+                            min(
+                                particle["sizes"][i][0] + int(v[0]),
+                                self.rooms_range[i][2],
+                            ),
+                            self.rooms_range[i][1],
+                        ),
+                        max(
+                            min(
+                                particle["sizes"][i][1] + int(v[1]),
+                                self.rooms_range[i][4],
+                            ),
+                            self.rooms_range[i][3],
+                        ),
+                    ]
+
+            # Save snapshots, the initial, final, and every 25 iterations
+            if _ == 0 or _ == self.max_iter - 1 or _ % 25 == 0:
+                # force the count number to be like: 0000, 0025, 0050, ...
+                save_snapshots(
+                    current_time,
+                    self.gbest_layout,
+                    str(_).zfill(4),
+                    self.gbest_fitness,
+                    self.mcts_iter,
+                    self.num_particles,
+                    self.max_iter,
+                )
+                print(
+                    f"Iteration: {_}, Polygon Type: {self.gbest_layout.cluster.geom_type}, Fitness: {self.gbest_fitness}"
+                )
+
+        return self.gbest_layout
+
+
+# PSO & (1+1)_EA algorithm
+class PSO_OnePlusOneEA:
+    def __init__(self, rooms_range, num_particles, max_iter, mcts_iter):
+        self.rooms_range = rooms_range
+        self.num_particles = num_particles
+        self.max_iter = max_iter
+        self.gbest_fitness = -float("inf")
+        self.gbest_sizes = []
+        self.gbest_layout = None
+        self.mcts_iter = mcts_iter
+        self.w_max = 0.78540
+        self.w_min = -0.16199
+        self.n = 1
+        self.fitness_history = []  # List to store fitness values
+
+        # Initialize particles
+        self.particles = []
+        for _ in range(num_particles):
+            particle = {
+                "sizes": [self.random_size(room) for room in rooms_range],
+                "velocity": [[0, 0] for _ in rooms_range],
+                "pbest_fitness": -float("inf"),
+                "pbest_sizes": [],
+            }
+            self.particles.append(particle)
+
+    def random_size(self, room):
+        min_w, max_w, min_d, max_d = room[1:]
+        return [
+            random.randint(int(min_w), int(max_w)),  # Ensure width is an integer
+            random.randint(int(min_d), int(max_d)),  # Ensure depth is an integer
+        ]
+
+    def optimize(self, boundary):
+        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+        print(f"PSO_OnePlusOneEA started at {current_time}")
+        for _ in range(self.max_iter):
+            is_gbest_updated = False
+            # Evaluate fitness for each particle
+            for index, particle in enumerate(self.particles):
+                # Evaluate fitness using MCTS
+                rooms = []
+                for i, size in enumerate(particle["sizes"]):
+                    rooms.append((self.rooms_range[i][0], size[0], size[1]))
+
+                # mcts = MCTS(boundary, rooms)
+                # best_layout = mcts.search()
+                one_one_EA = Position_OnePlusOneEA(boundary, rooms)
+                best_layout, fitness = one_one_EA.search()
+
+                # Update personal best
+                if fitness > particle["pbest_fitness"]:
+                    particle["pbest_fitness"] = fitness
+                    particle["pbest_sizes"] = particle["sizes"].copy()
+
+                # Update global best
+                if fitness > self.gbest_fitness:
+                    self.gbest_fitness = fitness
+                    self.gbest_sizes = particle["sizes"].copy()
+                    self.gbest_layout = best_layout
+                    is_gbest_updated = True
+
+            # Local search: swap the position of random two rooms
+            swaped_layout = swap_2rooms(copy.deepcopy(self.gbest_layout))
+            swaped_fitness = fitness_partial(swaped_layout)
+            if swaped_fitness > self.gbest_fitness:
+                self.gbest_layout = swaped_layout
+                self.gbest_fitness = swaped_fitness
+                is_gbest_updated = True
+
+            # Record fitness value
+            self.fitness_history.append(self.gbest_fitness)
+
+            if is_gbest_updated:
+                print(
+                    f"PSO_(1+1)EA Iteration {_} finished at: {datetime.now().strftime('%Y%m%d-%H%M%S')}, Fitness: {self.gbest_fitness}"
+                )
+
+            # Update velocities and positions
+            for particle in self.particles:
+                for i in range(len(particle["sizes"])):
+                    # w = 0.5  # inertia
+                    ## 1. Non-linearly decreasing inertia weight (better than linear)
+                    # w = ((self.max_iter - _) / self.max_iter) ** self.n * (
+                    #     self.w_min - self.w_max
+                    # ) + self.w_max
+                    ## 2. Linearly decreasing inertia weight
+                    w = self.w_max - (_ / self.max_iter) * (self.w_max - self.w_min)
+                    c1 = 0.4  # cognitive
+                    c2 = 0.4  # social
+
+                    v = [
+                        w * particle["velocity"][i][0]
+                        + c1 * (particle["pbest_sizes"][i][0] - particle["sizes"][i][0])
+                        + c2 * (self.gbest_sizes[i][0] - particle["sizes"][i][0]),
+                        w * particle["velocity"][i][1]
+                        + c1 * (particle["pbest_sizes"][i][1] - particle["sizes"][i][1])
+                        + c2 * (self.gbest_sizes[i][1] - particle["sizes"][i][1]),
+                    ]
+
+                    particle["velocity"][i] = v
+                    particle["sizes"][i] = [
+                        max(
+                            min(
+                                particle["sizes"][i][0] + int(v[0]),
+                                self.rooms_range[i][2],
+                            ),
+                            self.rooms_range[i][1],
+                        ),
+                        max(
+                            min(
+                                particle["sizes"][i][1] + int(v[1]),
+                                self.rooms_range[i][4],
+                            ),
+                            self.rooms_range[i][3],
+                        ),
+                    ]
+
+            # Save snapshots, the initial, final, and every 25 iterations
+            if _ == 0 or _ == self.max_iter - 1 or _ % 25 == 0:
+                # force the count number to be like: 0000, 0025, 0050, ...
+                save_snapshots(
+                    current_time,
+                    self.gbest_layout,
+                    str(_).zfill(4),
+                    self.gbest_fitness,
+                    self.mcts_iter,
+                    self.num_particles,
+                    self.max_iter,
+                )
+                print(
+                    f"Iteration: {_}, Polygon Type: {self.gbest_layout.cluster.geom_type}, Fitness: {self.gbest_fitness}"
+                )
+
+        return self.gbest_layout
+
+
+# 1+1 EA algorithm for mutating room's position(x, y)
 class Position_OnePlusOneEA:
     """
     1+1 EA algorithm for mutating room's position
@@ -1449,162 +1953,20 @@ class Position_OnePlusOneEA:
         return self.best_layout, self.best_fitness
 
 
-# PSO & (1+1)_EA algorithm
-class PSO:
-    def __init__(self, rooms_range, num_particles, max_iter, mcts_iter):
-        self.rooms_range = rooms_range
-        self.num_particles = num_particles
-        self.max_iter = max_iter
-        self.gbest_fitness = -float("inf")
-        self.gbest_sizes = []
-        self.gbest_layout = None
-        self.mcts_iter = mcts_iter
-        # self.full_fitness = -float("inf")
-        self.w_max = 0.78540
-        self.w_min = -0.16199
-        self.n = 1
-
-        # Initialize particles
-        self.particles = []
-        for _ in range(num_particles):
-            particle = {
-                "sizes": [self.random_size(room) for room in rooms_range],
-                "velocity": [[0, 0] for _ in rooms_range],
-                "pbest_fitness": -float("inf"),
-                "pbest_sizes": [],
-            }
-            self.particles.append(particle)
-
-    def random_size(self, room):
-        min_w, max_w, min_d, max_d = room[1:]
-        return [
-            random.randint(int(min_w), int(max_w)),  # Ensure width is an integer
-            random.randint(int(min_d), int(max_d)),  # Ensure depth is an integer
-        ]
-
-    def optimize(self, boundary):
-        current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
-        print(f"PSO started at {current_time}")
-        for _ in range(self.max_iter):
-            # Evaluate fitness for each particle
-            for index, particle in enumerate(self.particles):
-                # Evaluate fitness using MCTS
-                rooms = []
-                for i, size in enumerate(particle["sizes"]):
-                    rooms.append((self.rooms_range[i][0], size[0], size[1]))
-
-                # mcts = MCTS(boundary, rooms)
-                # best_layout = mcts.search()
-                one_one_EA = Position_OnePlusOneEA(boundary, rooms)
-                best_layout, fitness = one_one_EA.search()
-                # if _ % 5 == 0:
-                #     print(f"Particle {index}, Iteration {_}: Best fitness: {fitness}")
-
-                # fitness = fitness_all(best_layout)
-
-                # Update personal best
-                if fitness > particle["pbest_fitness"]:
-                    particle["pbest_fitness"] = fitness
-                    particle["pbest_sizes"] = particle["sizes"].copy()
-
-                # Update global best
-                if fitness > self.gbest_fitness:
-                    self.gbest_fitness = fitness
-                    self.gbest_sizes = particle["sizes"].copy()
-                    self.gbest_layout = best_layout
-
-            # Local search: swap the position of random two rooms
-            swaped_layout = swap_2rooms(copy.deepcopy(self.gbest_layout))
-            swaped_fitness = fitness_partial(swaped_layout)
-            if swaped_fitness > self.gbest_fitness:
-                self.gbest_layout = swaped_layout
-                self.gbest_fitness = swaped_fitness
-
-            # if self.gbest_fitness >= 1.6:
-            #     # Add doors and windows to the global best layout
-            #     copied_layout = copy.deepcopy(self.gbest_layout)
-            #     copied_layout.generate_doors_windows()
-            #     copied_layout.get_cluster()
-            #     tmp_full_fitness = fitness_all(copied_layout)
-            #     if tmp_full_fitness > self.full_fitness:
-            #         self.full_fitness = tmp_full_fitness
-            #         self.gbest_layout = copied_layout
-
-            print(
-                f"Iteration {_} finished at: {datetime.now().strftime('%Y%m%d-%H%M%S')}, Fitness: {self.gbest_fitness}"
-            )
-            # Update velocities and positions
-            for particle in self.particles:
-                for i in range(len(particle["sizes"])):
-                    # w = 0.5  # inertia
-                    ## 1. Non-linearly decreasing inertia weight (better than linear)
-                    # w = ((self.max_iter - _) / self.max_iter) ** self.n * (
-                    #     self.w_min - self.w_max
-                    # ) + self.w_max
-                    ## 2. Linearly decreasing inertia weight
-                    w = self.w_max - (_ / self.max_iter) * (self.w_max - self.w_min)
-                    c1 = 0.4  # cognitive
-                    c2 = 0.4  # social
-
-                    v = [
-                        w * particle["velocity"][i][0]
-                        + c1 * (particle["pbest_sizes"][i][0] - particle["sizes"][i][0])
-                        + c2 * (self.gbest_sizes[i][0] - particle["sizes"][i][0]),
-                        w * particle["velocity"][i][1]
-                        + c1 * (particle["pbest_sizes"][i][1] - particle["sizes"][i][1])
-                        + c2 * (self.gbest_sizes[i][1] - particle["sizes"][i][1]),
-                    ]
-
-                    particle["velocity"][i] = v
-                    particle["sizes"][i] = [
-                        max(
-                            min(
-                                particle["sizes"][i][0] + int(v[0]),
-                                self.rooms_range[i][2],
-                            ),
-                            self.rooms_range[i][1],
-                        ),
-                        max(
-                            min(
-                                particle["sizes"][i][1] + int(v[1]),
-                                self.rooms_range[i][4],
-                            ),
-                            self.rooms_range[i][3],
-                        ),
-                    ]
-
-            # Save snapshots, the initial, final, and every 25 iterations
-            if _ == 0 or _ == self.max_iter - 1 or _ % 25 == 0:
-                # force the count number to be like: 0000, 0025, 0050, ...
-                save_snapshots(
-                    current_time,
-                    self.gbest_layout,
-                    str(_).zfill(4),
-                    self.gbest_fitness,
-                    self.mcts_iter,
-                    self.num_particles,
-                    self.max_iter,
-                )
-                print(
-                    f"Iteration: {_}, Polygon Type: {self.gbest_layout.cluster.geom_type}, Fitness: {self.gbest_fitness}"
-                )
-
-        return self.gbest_layout
-
-
 # (1+1)_EA algorithm for mutate room's width and depth
 class Size_OnePlusOneEA:
     """
     1+1 EA algorithm for mutating room's width and depth after 1+1 EA for Position
     """
 
-    def __init__(self, boundary, rooms_range, max_iter=20000):
+    def __init__(self, boundary, rooms_range, max_iter=3000):
         self.boundary = boundary
         self.rooms_range = rooms_range
         self.max_iter = max_iter
         self.best_layout = None
         self.best_layout_rooms = []
         self.best_fitness = -float("inf")
+        self.fitness_history = []  # List to store fitness values
 
     def search(self):
         current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -1617,8 +1979,6 @@ class Size_OnePlusOneEA:
 
         # 1. randomly mutate room(s)' width and depth
         for i in range(self.max_iter):
-            # i = 0
-            # while self.best_fitness < 3.0:
             rooms = self.best_layout_rooms.copy()
             for j, room in enumerate(rooms):
                 # generate a mutation rate [0, 1]
@@ -1697,6 +2057,9 @@ class Size_OnePlusOneEA:
                     f"Iteration: {i}, Polygon Type: {self.best_layout.cluster.geom_type}, Fitness: {self.best_fitness}"
                 )
 
+            # Record fitness value
+            self.fitness_history.append(self.best_fitness)
+
             if i == self.max_iter - 1:
                 save_snapshots(
                     current_time,
@@ -1715,59 +2078,44 @@ class Size_OnePlusOneEA:
         return self.best_layout, self.best_fitness
 
 
-# List of configurations
-# (mcts_iter, num_particles, pso_iter)
-configurations = [
-    # (1000, 200, 200),
-    # (150, 200, 200),
-    (150, 100, 2000),
-    # (150, 2000, 2000),
-    # (150, 600, 200),
-    # (300, 20, 2000),
-    # (300, 200, 200),
-    # (300, 200, 2000),
-    # (300, 400, 400),
-]
-
-
-def run_pso_mcts(mcts_iter, num_particles, pso_iter):
-    print(
-        f"Running PSO with mcts_iter={mcts_iter} , num_particles={num_particles}, pso_iter={pso_iter}"
-    )
-    # algorithm logic
-    pso = PSO(
-        rooms_range, num_particles=num_particles, max_iter=pso_iter, mcts_iter=mcts_iter
-    )
-    best_house = pso.optimize(boundary)
-
-    # final check
-    if len(best_house.rooms) < len(rooms_range):
-        print("Failed to place all rooms")
-
-    return best_house
-
-
-def run_1_plus_1_EA():
-    print("Running 1+1 EA")
-    # 1+1 EA
-    size_one_one_EA = Size_OnePlusOneEA(boundary, rooms_range)
-    best_house, fitness = size_one_one_EA.search()
-
-    # final check
-    if len(best_house.rooms) < len(rooms_range):
-        print("Failed to place all rooms")
-
-    return best_house
-
-
-# Function to run a single configuration
-def run_config(config):
-    mcts_iter, particles, pso_iter = config
-    # run_pso_mcts(mcts_iter, particles, pso_iter)
-    run_1_plus_1_EA()
-
-
-# Use multiprocessing to run configurations in parallel
+# Main function to compare algorithms
 if __name__ == "__main__":
-    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
-        pool.map(run_config, configurations)
+    # Record start time for 1+1 EA
+    start_time_ea = time.time()
+    size_one_plus_OneEA = Size_OnePlusOneEA(boundary, rooms_range, max_iter=30000)
+    size_one_plus_OneEA.search()
+    end_time_ea = time.time()
+
+    # Record start time for PSO_OnePlusOneEA
+    start_time_pso = time.time()
+    pso_1P1EA = PSO_OnePlusOneEA(
+        rooms_range, num_particles=100, max_iter=30000, mcts_iter=150
+    )
+    pso_1P1EA.optimize(boundary)
+    end_time_pso = time.time()
+
+    # Record start time for PSO_MCTS
+    start_time_pso_mcts = time.time()
+    pso_mcts = PSO_MCTS(rooms_range, num_particles=100, max_iter=30000, mcts_iter=150)
+    pso_mcts.optimize(boundary)
+    end_time_pso_mcts = time.time()
+
+    # Plot fitness history
+    plt.figure(figsize=(10, 6))
+    plt.plot(size_one_plus_OneEA.fitness_history, label="1+1 EA")
+    plt.plot(pso_1P1EA.fitness_history, label="PSO-(1+1)EA")
+    plt.plot(pso_mcts.fitness_history, label="PSO-MCTS")
+    plt.xlabel("Iterations")
+    plt.ylabel("Fitness")
+    plt.title("Fitness Comparison Between 3 Algorithm Combinations")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig("fitness_comparison.png")
+    plt.show()
+
+    # Print execution times
+    print(f"1+1 EA execution time: {end_time_ea - start_time_ea:.2f} seconds")
+    print(f"PSO-(1+1)EA execution time: {end_time_pso - start_time_pso:.2f} seconds")
+    print(
+        f"PSO-MCTS execution time: {end_time_pso_mcts - start_time_pso_mcts:.2f} seconds"
+    )
