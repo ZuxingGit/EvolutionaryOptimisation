@@ -1,184 +1,306 @@
-@inproceedings{alexander2017evolution,
-  title={Evolution of artistic image variants through feature based diversity optimisation},
-  author={Alexander, Brad and Kortman, James and Neumann, Aneta},
-  booktitle={Proceedings of the Genetic and Evolutionary Computation Conference},
-  pages={171--178},
-  year={2017}
+@inproceedings{10.1007/11732242_56,
+  author    = {Brintrup, Alexandra Melike
+               and Takagi, Hideyuki
+               and Ramsden, Jeremy},
+  editor    = {Rothlauf, Franz
+               and Branke, J{\"u}rgen
+               and Cagnoni, Stefano
+               and Costa, Ernesto
+               and Cotta, Carlos
+               and Drechsler, Rolf
+               and Lutton, Evelyne
+               and Machado, Penousal
+               and Moore, Jason H.
+               and Romero, Juan
+               and Smith, George D.
+               and Squillero, Giovanni
+               and Takagi, Hideyuki},
+  title     = {Evaluation of Sequential, Multi-objective, and Parallel Interactive Genetic Algorithms for Multi-objective Floor Plan Optimisation},
+  booktitle = {Applications of Evolutionary Computing},
+  year      = {2006},
+  publisher = {Springer Berlin Heidelberg},
+  address   = {Berlin, Heidelberg},
+  pages     = {586--598},
+  abstract  = {We propose a sequential IGA, multi-objective IGA and parallel interactive genetic algorithm (IGA), and evaluate them with a multi-objective floor planning task through both simulation and real IGA users. Combining human evaluation with an optimization system for engineering design enables us to embed domain specific knowledge which is frequently hard to describe, subjective criteria and preferences in engineering design. We introduce IGA technique to extend previous approaches with sequential single objective GA and multi-objective GA. We also introduce parallel IGA newly. Experimental results show that (1) the multi-objective IGA and the parallel IGA clearly provide better results than the sequential IGA, and (2) the multi-objective IGA provides more diverse results and faster convergence for a floor planning task although the parallel IGA provides better fitness convergence.},
+  isbn      = {978-3-540-33238-1}
 }
 
-@article{example2023,
-  author = {John Doe},
-  title = {An Example Article},
-  journal = {Journal of Examples},
-  year = {2023},
-  volume = {1},
-  number = {1},
-  pages = {1-10},
+@article{CHAICHI2024108842,
+  title    = {Multi-objective optimization of a residential zone by proposing appropriate comfort factors using none dominated sorting genetic algorithm},
+  journal  = {Journal of Building Engineering},
+  volume   = {86},
+  pages    = {108842},
+  year     = {2024},
+  issn     = {2352-7102},
+  doi      = {https://doi.org/10.1016/j.jobe.2024.108842},
+  url      = {https://www.sciencedirect.com/science/article/pii/S2352710224004108},
+  author   = {Behrang Chaichi and Ali {Andaji Garmaroodi}},
+  abstract = {To identify optimal solutions within a plethora of alternatives with respect to architectural design, multi-objective optimization has been widely acknowledged as a dependable approach. Nevertheless, such optimizations have frequently been conducted as single-objective analyses or have failed to consider both the quantity and uniformity of illumination concurrently with energy consumption as primary objectives. This study posits a proposal consisting of two metrics, one pertaining to the quantity of light and the other to its uniformity. These metrics are derived from the useful daylight illuminance (UDI) and are deemed appropriate for employment in an optimization process. In conjunction with energy consumption, these metrics serve as objectives in a multi-objective optimization that is carried out with a NSGA-II algorithm specifically developed and calibrated for this particular problem. The result of the simulation yields a solution set in three dimensions. The interdependence between the variants and their relationship with each variable were thoroughly examined to facilitate the selection of the optimal solution from the pareto front.}
 }
 
-@article{10.1145/3355089.3356556,
-author = {Wu, Wenming and Fu, Xiao-Ming and Tang, Rui and Wang, Yuhan and Qi, Yu-Hao and Liu, Ligang},
-title = {Data-driven interior plan generation for residential buildings},
-year = {2019},
-issue_date = {December 2019},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-volume = {38},
-number = {6},
-issn = {0730-0301},
-url = {https://doi.org/10.1145/3355089.3356556},
-doi = {10.1145/3355089.3356556},
-abstract = {We propose a novel data-driven technique for automatically and efficiently generating floor plans for residential buildings with given boundaries. Central to this method is a two-stage approach that imitates the human design process by locating rooms first and then walls while adapting to the input building boundary. Based on observations of the presence of the living room in almost all floor plans, our designed learning network begins with positioning a living room and continues by iteratively generating other rooms. Then, walls are first determined by an encoder-decoder network, and then they are refined to vector representations using dedicated rules. To effectively train our networks, we construct RPLAN - a manually collected large-scale densely annotated dataset of floor plans from real residential buildings. Intensive experiments, including formative user studies and comparisons, are conducted to illustrate the feasibility and efficacy of our proposed approach. By comparing the plausibility of different floor plans, we have observed that our method substantially outperforms existing methods, and in many cases our floor plans are comparable to human-created ones.},
-journal = {ACM Trans. Graph.},
-month = nov,
-articleno = {234},
-numpages = {12},
-keywords = {data-driven approach, deep learning, floor plan generation, interior layout, neural network}
-}
-
-@INPROCEEDINGS{9511363,
-  author={Lee, Philip K. and Stenger, Björn},
-  booktitle={2021 17th International Conference on Machine Vision and Applications (MVA)}, 
-  title={Shape-Based Floor Plan Retrieval Using Parse Tree Matching}, 
-  year={2021},
-  volume={},
-  number={},
-  pages={1-5},
-  keywords={Measurement;Shape;Machine vision;Layout;Grammar;Floors},
-  doi={10.23919/MVA51890.2021.9511363}
-}
-
-@article{YAN2024110546,
-title = {Computational design of residential units’ floor layout: A heuristic algorithm},
-journal = {Journal of Building Engineering},
-volume = {96},
-pages = {110546},
-year = {2024},
-issn = {2352-7102},
-doi = {https://doi.org/10.1016/j.jobe.2024.110546},
-url = {https://www.sciencedirect.com/science/article/pii/S2352710224021144},
-author = {Shurui Yan and Nianxiong Liu},
-keywords = {Computational design, Monte Carlo tree search, Particle swarm optimization, Residential buildings, Floor layout design},
-abstract = {Computer-aided intelligent design can improve the quality and efficiency of residential building design. However, the design conditions are diverse, and numerous combinations of spatial elements exist. We propose a heuristic algorithm—the combined Monte Carlo tree search (MCTS) and particle swarm optimization (PSO) algorithm (PSO-MCTS)—for the automated design of residential floor layouts. The MCTS algorithm deals with discrete variables (room locations). It considers architectural design experience and design standards during node pruning to compress the search space and simplify the computation. The PSO algorithm deals with continuous variables (room sizes) and accelerates the computing speed due to parallel processing. The PSO-MCTS algorithm achieves a good balance between computational efficiency and accuracy. It is suitable for various design conditions and requirements. The input parameters include the daylight façade, boundary scope, entrance location, room type and size, and relationships with adjacent rooms. The PSO-MCTS provides 100 %, 80 %, and 75 % better results than heuristic algorithms, designs by architects, and a state-of-the-art deep learning model, respectively.}
-}
-
-@article{WANG2023100238,
-title = {Generative design of floor plans of multi-unit residential buildings based on consumer satisfaction and energy performance},
-journal = {Developments in the Built Environment},
-volume = {16},
-pages = {100238},
-year = {2023},
-issn = {2666-1659},
-doi = {https://doi.org/10.1016/j.dibe.2023.100238},
-url = {https://www.sciencedirect.com/science/article/pii/S2666165923001205},
-author = {Ting-Kwei Wang and Weina Duan},
-keywords = {Performance-based generative design, Residential floor plan design, Consumer satisfaction, Energy performance},
-abstract = {Satisfying consumers is an important task in the design of residential floor plans. However, the design of residential floor plans with the aim of improving consumer satisfaction and energy performance has not been fully explored. Also, the preferences of different customer groups regarding customer satisfaction have not been studied. Traditional design and optimization methods still have limitations in terms of performance improvement, while performance-based generative design methods can explore the performance improvement potential of a larger range of solution spaces. Therefore, this study introduces a generative design framework that is grounded on optimizing energy performance and consumer satisfaction for multi-unit residential floor plans, which consists of four main processes: 1) Generation of floor plan schemes. 2) Evaluation of consumer satisfaction and energy performance of the generated schemes. 3) Running a multi-objective optimization to obtain optimal schemes. 4) The final floor plan scheme is determined by the decision maker. The proposed framework was employed in a real design case, and seven optimal solutions were obtained. Compared with the initial scheme, the maximum improvement in consumer satisfaction and energy performance was up to 38.78% and 11.18% respectively. The results also indicated that the preferences of different types of consumers differed significantly. Thus, different evaluation functions have been created to provide solutions with higher satisfaction levels targeting different types of consumers. As such, generative design and optimization of residential floor plans for specific types of consumers can be undertaken at an early design stage to improve consumer satisfaction and reduce energy consumption.}
-}
-
-@InProceedings{10.1007/11732242_56,
-author="Brintrup, Alexandra Melike
-and Takagi, Hideyuki
-and Ramsden, Jeremy",
-editor="Rothlauf, Franz
-and Branke, J{\"u}rgen
-and Cagnoni, Stefano
-and Costa, Ernesto
-and Cotta, Carlos
-and Drechsler, Rolf
-and Lutton, Evelyne
-and Machado, Penousal
-and Moore, Jason H.
-and Romero, Juan
-and Smith, George D.
-and Squillero, Giovanni
-and Takagi, Hideyuki",
-title="Evaluation of Sequential, Multi-objective, and Parallel Interactive Genetic Algorithms for Multi-objective Floor Plan Optimisation",
-booktitle="Applications of Evolutionary Computing",
-year="2006",
-publisher="Springer Berlin Heidelberg",
-address="Berlin, Heidelberg",
-pages="586--598",
-abstract="We propose a sequential IGA, multi-objective IGA and parallel interactive genetic algorithm (IGA), and evaluate them with a multi-objective floor planning task through both simulation and real IGA users. Combining human evaluation with an optimization system for engineering design enables us to embed domain specific knowledge which is frequently hard to describe, subjective criteria and preferences in engineering design. We introduce IGA technique to extend previous approaches with sequential single objective GA and multi-objective GA. We also introduce parallel IGA newly. Experimental results show that (1) the multi-objective IGA and the parallel IGA clearly provide better results than the sequential IGA, and (2) the multi-objective IGA provides more diverse results and faster convergence for a floor planning task although the parallel IGA provides better fitness convergence.",
-isbn="978-3-540-33238-1"
-}
-
-@INPROCEEDINGS{7844659,
-  author={de Almeida, Ana and Taborda, Bruno and Santos, Filipe and Kwiecinski, Krystian and Eloy, Sara},
-  booktitle={2016 IEEE International Conference on Systems, Man, and Cybernetics (SMC)}, 
-  title={A genetic algorithm application for automatic layout design of modular residential homes}, 
-  year={2016},
-  volume={},
-  number={},
-  pages={002774-002778},
-  keywords={Layout;Biological cells;Genetic algorithms;Sociology;Statistics;Grammar;Genetics},
-  doi={10.1109/SMC.2016.7844659}
+@inproceedings{7844659,
+  author    = {de Almeida, Ana and Taborda, Bruno and Santos, Filipe and Kwiecinski, Krystian and Eloy, Sara},
+  booktitle = {2016 IEEE International Conference on Systems, Man, and Cybernetics (SMC)},
+  title     = {A genetic algorithm application for automatic layout design of modular residential homes},
+  year      = {2016},
+  volume    = {},
+  number    = {},
+  pages     = {002774-002778},
+  keywords  = {Layout;Biological cells;Genetic algorithms;Sociology;Statistics;Grammar;Genetics},
+  doi       = {10.1109/SMC.2016.7844659}
 }
 
 @article{doi:10.1177/1478077119832982,
-author = {Maciej Nisztuk and Paweł B. Myszkowski},
-title ={Hybrid Evolutionary Algorithm applied to Automated Floor Plan Generation},
-
-journal = {International Journal of Architectural Computing},
-volume = {17},
-number = {3},
-pages = {260-283},
-year = {2019},
-doi = {10.1177/1478077119832982},
-
-URL = { 
-    
-        https://doi.org/10.1177/1478077119832982
-    
-    
-
-},
-eprint = { 
-    
-        https://doi.org/10.1177/1478077119832982
-    
-    
-
-}
-,
-    abstract = { The article presents the application of Hybrid Evolutionary and Greedy-based algorithms to the problem of Automated Floor Plan Generation. The described optimization issue is part of a wider domain of Computer-Aided Architectural Design. The article covers the extensive description of the representation domain model (architectural canonical guidelines, user design requirements and constraints) and the explanation of proposed approach: problem representation, genetic algorithm operators, and fitness function definition. The research experimental procedures are based on real-world data: the architectural design guidelines being the design constraints and five real-world functional programs introduced and proposed as benchmarks. The article summarizes the implementation of the proposed approach, compares the Hybrid Evolutionary Algorithm experimental results with the Greedy-based algorithm, and suggests possible extensions and future research directions. }
+  author   = {Maciej Nisztuk and Paweł B. Myszkowski},
+  title    = {Hybrid Evolutionary Algorithm applied to Automated Floor Plan Generation},
+  journal  = {International Journal of Architectural Computing},
+  volume   = {17},
+  number   = {3},
+  pages    = {260-283},
+  year     = {2019},
+  doi      = {10.1177/1478077119832982},
+  url      = { 
+              
+              https://doi.org/10.1177/1478077119832982
+              
+              
+              
+              },
+  eprint   = { 
+              
+              https://doi.org/10.1177/1478077119832982
+              
+              
+              
+              },
+  abstract = { The article presents the application of Hybrid Evolutionary and Greedy-based algorithms to the problem of Automated Floor Plan Generation. The described optimization issue is part of a wider domain of Computer-Aided Architectural Design. The article covers the extensive description of the representation domain model (architectural canonical guidelines, user design requirements and constraints) and the explanation of proposed approach: problem representation, genetic algorithm operators, and fitness function definition. The research experimental procedures are based on real-world data: the architectural design guidelines being the design constraints and five real-world functional programs introduced and proposed as benchmarks. The article summarizes the implementation of the proposed approach, compares the Hybrid Evolutionary Algorithm experimental results with the Greedy-based algorithm, and suggests possible extensions and future research directions. }
 }
 
-@INPROCEEDINGS{9675541,
-  author={Subramanian, R.Raja and DheenaDayalan, T.M. and Badhrirajan, T. and Dhinakaran, C. and Devakirubai, C.Glory and Sudharsan, R. Raja},
-  booktitle={2021 International Conference on Advancements in Electrical, Electronics, Communication, Computing and Automation (ICAECA)}, 
-  title={An Automated House Plan Generator leveraging Genetic Algorithms}, 
-  year={2021},
-  volume={},
-  number={},
-  pages={1-6},
-  keywords={Costs;Automation;Databases;Layout;Two dimensional displays;Software;Telecommunication computing},
-  doi={10.1109/ICAECA52838.2021.9675541}}
-
-@article{CHAICHI2024108842,
-title = {Multi-objective optimization of a residential zone by proposing appropriate comfort factors using none dominated sorting genetic algorithm},
-journal = {Journal of Building Engineering},
-volume = {86},
-pages = {108842},
-year = {2024},
-issn = {2352-7102},
-doi = {https://doi.org/10.1016/j.jobe.2024.108842},
-url = {https://www.sciencedirect.com/science/article/pii/S2352710224004108},
-author = {Behrang Chaichi and Ali {Andaji Garmaroodi}},
-abstract = {To identify optimal solutions within a plethora of alternatives with respect to architectural design, multi-objective optimization has been widely acknowledged as a dependable approach. Nevertheless, such optimizations have frequently been conducted as single-objective analyses or have failed to consider both the quantity and uniformity of illumination concurrently with energy consumption as primary objectives. This study posits a proposal consisting of two metrics, one pertaining to the quantity of light and the other to its uniformity. These metrics are derived from the useful daylight illuminance (UDI) and are deemed appropriate for employment in an optimization process. In conjunction with energy consumption, these metrics serve as objectives in a multi-objective optimization that is carried out with a NSGA-II algorithm specifically developed and calibrated for this particular problem. The result of the simulation yields a solution set in three dimensions. The interdependence between the variants and their relationship with each variable were thoroughly examined to facilitate the selection of the optimal solution from the pareto front.}
+@inproceedings{9675541,
+  author    = {Subramanian, R.Raja and DheenaDayalan, T.M. and Badhrirajan, T. and Dhinakaran, C. and Devakirubai, C.Glory and Sudharsan, R. Raja},
+  booktitle = {2021 International Conference on Advancements in Electrical, Electronics, Communication, Computing and Automation (ICAECA)},
+  title     = {An Automated House Plan Generator leveraging Genetic Algorithms},
+  year      = {2021},
+  volume    = {},
+  number    = {},
+  pages     = {1-6},
+  keywords  = {Costs;Automation;Databases;Layout;Two dimensional displays;Software;Telecommunication computing},
+  doi       = {10.1109/ICAECA52838.2021.9675541}
 }
 
 @article{WANG20051329,
-title = {A hybrid genetic algorithm–neural network strategy for simulation optimization},
-journal = {Applied Mathematics and Computation},
-volume = {170},
-number = {2},
-pages = {1329-1343},
-year = {2005},
-issn = {0096-3003},
-doi = {https://doi.org/10.1016/j.amc.2005.01.024},
-url = {https://www.sciencedirect.com/science/article/pii/S0096300305000676},
-author = {Ling Wang},
-keywords = {Genetic algorithm, Neural network, Hybrid strategy, Simulation optimization},
-abstract = {Simulation optimization aims at determining the best values of input parameters, while the analytical objective function and constraints are not explicitly known in terms of design variables and their values only can be estimated by complicated analysis or time-consuming simulation. In this paper, a hybrid genetic algorithm–neural network strategy (GA–NN) is proposed for such kind of optimization problems. The good approximation performance of neural network (NN) and the effective and robust evolutionary searching ability of genetic algorithm (GA) are applied in hybrid sense, where NNs are employed in predicting the objective value, and GA is adopted in searching optimal designs based on the predicted fitness values. Numerical simulation results and comparisons based on a well-known pressure vessel design problem demonstrate the feasibility and effectiveness of the framework, and much better results are achieved than some existed literature results.}
+  title    = {A hybrid genetic algorithm–neural network strategy for simulation optimization},
+  journal  = {Applied Mathematics and Computation},
+  volume   = {170},
+  number   = {2},
+  pages    = {1329-1343},
+  year     = {2005},
+  issn     = {0096-3003},
+  doi      = {https://doi.org/10.1016/j.amc.2005.01.024},
+  url      = {https://www.sciencedirect.com/science/article/pii/S0096300305000676},
+  author   = {Ling Wang},
+  keywords = {Genetic algorithm, Neural network, Hybrid strategy, Simulation optimization},
+  abstract = {Simulation optimization aims at determining the best values of input parameters, while the analytical objective function and constraints are not explicitly known in terms of design variables and their values only can be estimated by complicated analysis or time-consuming simulation. In this paper, a hybrid genetic algorithm–neural network strategy (GA–NN) is proposed for such kind of optimization problems. The good approximation performance of neural network (NN) and the effective and robust evolutionary searching ability of genetic algorithm (GA) are applied in hybrid sense, where NNs are employed in predicting the objective value, and GA is adopted in searching optimal designs based on the predicted fitness values. Numerical simulation results and comparisons based on a well-known pressure vessel design problem demonstrate the feasibility and effectiveness of the framework, and much better results are achieved than some existed literature results.}
+}
+
+@article{WANG2023100238,
+  title    = {Generative design of floor plans of multi-unit residential buildings based on consumer satisfaction and energy performance},
+  journal  = {Developments in the Built Environment},
+  volume   = {16},
+  pages    = {100238},
+  year     = {2023},
+  issn     = {2666-1659},
+  doi      = {https://doi.org/10.1016/j.dibe.2023.100238},
+  url      = {https://www.sciencedirect.com/science/article/pii/S2666165923001205},
+  author   = {Ting-Kwei Wang and Weina Duan},
+  keywords = {Performance-based generative design, Residential floor plan design, Consumer satisfaction, Energy performance},
+  abstract = {Satisfying consumers is an important task in the design of residential floor plans. However, the design of residential floor plans with the aim of improving consumer satisfaction and energy performance has not been fully explored. Also, the preferences of different customer groups regarding customer satisfaction have not been studied. Traditional design and optimization methods still have limitations in terms of performance improvement, while performance-based generative design methods can explore the performance improvement potential of a larger range of solution spaces. Therefore, this study introduces a generative design framework that is grounded on optimizing energy performance and consumer satisfaction for multi-unit residential floor plans, which consists of four main processes: 1) Generation of floor plan schemes. 2) Evaluation of consumer satisfaction and energy performance of the generated schemes. 3) Running a multi-objective optimization to obtain optimal schemes. 4) The final floor plan scheme is determined by the decision maker. The proposed framework was employed in a real design case, and seven optimal solutions were obtained. Compared with the initial scheme, the maximum improvement in consumer satisfaction and energy performance was up to 38.78% and 11.18% respectively. The results also indicated that the preferences of different types of consumers differed significantly. Thus, different evaluation functions have been created to provide solutions with higher satisfaction levels targeting different types of consumers. As such, generative design and optimization of residential floor plans for specific types of consumers can be undertaken at an early design stage to improve consumer satisfaction and reduce energy consumption.}
+}
+
+@article{YAN2024110546,
+  title    = {Computational design of residential units’ floor layout: A heuristic algorithm},
+  journal  = {Journal of Building Engineering},
+  volume   = {96},
+  pages    = {110546},
+  year     = {2024},
+  issn     = {2352-7102},
+  doi      = {https://doi.org/10.1016/j.jobe.2024.110546},
+  url      = {https://www.sciencedirect.com/science/article/pii/S2352710224021144},
+  author   = {Shurui Yan and Nianxiong Liu},
+  keywords = {Computational design, Monte Carlo tree search, Particle swarm optimization, Residential buildings, Floor layout design},
+  abstract = {Computer-aided intelligent design can improve the quality and efficiency of residential building design. However, the design conditions are diverse, and numerous combinations of spatial elements exist. We propose a heuristic algorithm—the combined Monte Carlo tree search (MCTS) and particle swarm optimization (PSO) algorithm (PSO-MCTS)—for the automated design of residential floor layouts. The MCTS algorithm deals with discrete variables (room locations). It considers architectural design experience and design standards during node pruning to compress the search space and simplify the computation. The PSO algorithm deals with continuous variables (room sizes) and accelerates the computing speed due to parallel processing. The PSO-MCTS algorithm achieves a good balance between computational efficiency and accuracy. It is suitable for various design conditions and requirements. The input parameters include the daylight façade, boundary scope, entrance location, room type and size, and relationships with adjacent rooms. The PSO-MCTS provides 100 %, 80 %, and 75 % better results than heuristic algorithms, designs by architects, and a state-of-the-art deep learning model, respectively.}
+}
+
+@inproceedings{KennedyJ.1997Adbv,
+  year      = {1997},
+  keywords  = {State-space methods ; Statistics ; Stochastic processes},
+  language  = {eng ; jpn},
+  pages     = {4104-4108 vol.5},
+  publisher = {IEEE},
+  title     = {A discrete binary version of the particle swarm algorithm},
+  volume    = {5},
+  abstract  = {The particle swarm algorithm adjusts the trajectories of a population of "particles" through a problem space on the basis of information about each particle's previous best performance and the best previous performance of its neighbors. Previous versions of the particle swarm have operated in continuous space, where trajectories are defined as changes in position on some number of dimensions. The paper reports a reworking of the algorithm to operate on discrete binary variables. In the binary version, trajectories are changes in the probability that a coordinate will take on a zero or one value. Examples, applications, and issues are discussed.},
+  author    = {Kennedy, J. and Eberhart, R.C.},
+  booktitle = {1997 IEEE International Conference on Systems, Man, and Cybernetics. Computational Cybernetics and Simulation},
+  isbn      = {9780780340534},
+  issn      = {1062-922X}
+}
+
+@inproceedings{10.5555/3666122.3666421,
+  author    = {Shi, Yunqi and Xue, Ke and Song, Lei and Qian, Chao},
+  title     = {Macro placement by wire-mask-guided black-box optimization},
+  year      = {2023},
+  publisher = {Curran Associates Inc.},
+  address   = {Red Hook, NY, USA},
+  abstract  = {The development of very large-scale integration (VLSI) technology has posed new challenges for electronic design automation (EDA) techniques in chip floorplanning. During this process, macro placement is an important subproblem, which tries to determine the positions of all macros with the aim of minimizing half-perimeter wirelength (HPWL) and avoiding overlapping. Previous methods include packing-based, analytical and reinforcement learning methods. In this paper, we propose a new black-box optimization (BBO) framework (called WireMask-BBO) for macro placement, by using a wire-mask-guided greedy procedure for objective evaluation. Equipped with different BBO algorithms, WireMask-BBO empirically achieves significant improvements over previous methods, i.e., achieves significantly shorter HPWL by using much less time. Furthermore, it can fine-tune existing placements by treating them as initial solutions, which can bring up to 50\% improvement in HPWL. WireMask-BBO has the potential to significantly improve the quality and efficiency of chip floorplanning, which makes it appealing to researchers and practitioners in EDA and will also promote the application of BBO. Our code is available at https://github.com/lamda-bbo/WireMask-BBO.},
+  booktitle = {Proceedings of the 37th International Conference on Neural Information Processing Systems},
+  articleno = {299},
+  numpages  = {19},
+  location  = {New Orleans, LA, USA},
+  series    = {NIPS '23}
+}
+
+@article{LaignelGraziella2021Fpgt,
+  year      = {2021},
+  keywords  = {Algorithms ; Apartments ; Floor plans ; Floors},
+  language  = {eng},
+  pages     = {103491-},
+  publisher = {Elsevier B.V},
+  title     = {Floor plan generation through a mixed constraint programming-genetic optimization approach},
+  volume    = {123},
+  abstract  = {We present a novel approach for automatic apartment layout generation. Given a polygonal apartment envelope and a list of rooms with associated area, our so-called Optimizer algorithm generates several floor plans aiming at both architectural and functional constraints.
+               To do so, Optimizer discretizes the floor space into a grid according to architectural constraints and reduces the problem to a cell assignment which is solved through a coupled constraint programming - genetic optimization approach.
+               Obtained results demonstrate the feasibility of our approach, customized plans are architecturally and functionally valid, they are mostly generated in about 1 min.
+               •Automatic floor plan generation algorithm based on a mixed constraint programming - genetic optimization approach.•For a given apartment envelope, several alternatives satisfying both architectural and functional constraints are obtained.•In most cases, solutions are obtained is less than few minutes.},
+  author    = {Laignel, Graziella and Pozin, Nicolas and Geffrier, Xavier and Delevaux, Loukas and Brun, Florian and Dolla, Bastien},
+  address   = {Amsterdam},
+  copyright = {2020 Elsevier B.V.},
+  issn      = {0926-5805},
+  journal   = {Automation in construction}
+}
+
+@article{ZouDexuan2024Amsa,
+  year      = {2024},
+  keywords  = {Algorithms ; Artificial intelligence ; Computational intelligence ; Design ; Designers ; Engineering ; Floor plans ; Topology},
+  language  = {eng},
+  number    = {2},
+  pages     = {1613-1624},
+  publisher = {Springer Berlin Heidelberg},
+  title     = {A memory-based simulated annealing algorithm and a new auxiliary function for the fixed-outline floorplanning with soft blocks},
+  volume    = {15},
+  abstract  = {A memory-based simulated annealing (MSA) algorithm is proposed for the fixed-outline floorplanning with soft blocks. MSA constructs a memory pool to store some historical best solutions. Moreover, it adopts a real-time monitoring strategy to check whether a solution has been trapped in a local optimum. In case a solution encounters this predicament, it will be replaced by the one from the memory pool, and the current temperature will be regenerated by continuously perturbing the new solution several times. To meet the fixed-outline requirements, a new auxiliary function is formulated based on the geometric structure of the current floorplan, and it is very helpful in driving MSA to search towards potential solution space. Concretely, the area information of all violated blocks is utilized to construct an auxiliary function. Moreover, the excessive area of a violated block can be weighted by three different coefficients, which depend on the relative position of the block and the fixed-outline. Additionally, due to its simple topology and strong applicability, B
+               ⋆
+               -tree representation is employed to perturb a solution in each generation. The efficiency of the proposed method is demonstrated on six GSRC floorplan benchmark examples with various white space and aspect ratios. Two groups of Matlab simulations show that our approach can achieve better floorplanning results and satisfy both the fixed-outline and non-overlapping constraints while optimizing circuit performance.},
+  author    = {Zou, Dexuan and Wang, Gai-Ge and Sangaiah, Arun K. and Kong, Xiangyong},
+  address   = {Berlin/Heidelberg},
+  copyright = {Springer-Verlag GmbH Germany, part of Springer Nature 2017},
+  issn      = {1868-5137},
+  journal   = {Journal of ambient intelligence and humanized computing}
+}
+
+@article{KangShinjin2022Fpof,
+  year      = {2022},
+  keywords  = {Computer science ; Data Collection ; Floor plans ; Genetic algorithms ; Mobile computing ; Translators},
+  language  = {eng},
+  number    = {2},
+  pages     = {2724-2743},
+  publisher = {Springer US},
+  title     = {Floor plan optimization for indoor environment based on multimodal data},
+  volume    = {78},
+  abstract  = {Designing an optimal indoor space is challenging in interior architecture. The optimal space design requires a comprehensive analysis of the living situation of residents in a space. However, it is extremely difficult to collect data from the space where daily life occurs. Many spatial analysis sensors are required because various daily life data must be collected precisely. Hence, it is difficult for indoor space designers to use the daily-life information of users when managing indoor layouts or floor plans. In this paper, we introduce a technique to solve this problem: simple mobile application (app) logs are used to identify the daily-life patterns of users in an indoor space, and the results are used to create the optimal space layout. We collect and process key information from the mobile app logs and Google app servers to generate a high-dimensional dataset required for user behavior analysis. Subsequently, we suggest a floor plan that minimizes the living cost using a two-dimensional genetic algorithm. Our method will facilitate the spatial analysis of currently inhabited indoor space and reduce the space utilization feedback costs of users.},
+  author    = {Kang, Shinjin and Kim, Soo Kyun},
+  address   = {New York},
+  copyright = {The Author(s), under exclusive licence to Springer Science+Business Media, LLC, part of Springer Nature 2021},
+  issn      = {0920-8542},
+  journal   = {The Journal of supercomputing}
+}
+
+@article{ZawidzkiMachi2020Moot,
+  year      = {2020},
+  language  = {eng},
+  pages     = {102766-},
+  publisher = {Elsevier Ltd},
+  title     = {Multi-objective optimization of the floor plan of a single story family house considering position and orientation},
+  volume    = {141},
+  abstract  = {•A new method for enhancing architectural design in the early stage is presented.•Coarse-grid layout optimization is extended with new global site-specific objectives.•Psychological factors: acoustic & visual comfort introduced as optimization criteria.•Novel general formal framework as architectural design aid is presented & discussed.•Case study of multiobjective optimization of single-story building on given site.
+               Improving the architectural layout for diverse objectives using rigorous mathematical optimization methods gradually receives more attention by the researchers. Such optimization however, is usually reduced to a much simpler and relatively well-defined problem such as: facility layout optimization, quadratic assignment problem, rectangle partitioning. Nonetheless, architects are usually skeptical about such approaches since they produce solutions which lack certain architectural qualities.
+               This paper proposes a framework where architectural functional layout (FL) is optimized for the following objectives: functionality (defined by users), insolation (calculated according to geographical conditions), outside view attractiveness (assessed on-site) and external noise (measured on-site). Incorporating the latter two and simultaneous optimization of FLs for objectives related specifically to the site: position and orientation are the novel contributions of this paper. Firstly, a set of candidate FLs is generated, next they are evaluated for optimal location and orientation on a given site. Optimality is conceived here as maximization of real-valued objective function combining: user’s satisfaction level of the outside views, shielding from external noise, and insolation preference. The importance of these factors for each type of room is assessed by the user (as weights).
+               A case study on an existing site is presented. The view quality was arbitrarily assessed and the noise map was assessed by A-weighted equivalent sound level measurements.
+               A general gradient-based method for finding optimal and near-optimal solutions was applied. The output of this optimization is a set of room configurations with their locations and orientations on the site returned to the user for final selection.},
+  author    = {Zawidzki, Machi and Szklarski, Jacek},
+  copyright = {2019 The Authors},
+  issn      = {0965-9978},
+  journal   = {Advances in engineering software (1992)}
+}
+
+@article{HousseinEssamH.2021MAiP,
+  year      = {2021},
+  keywords  = {Metaheuristics},
+  language  = {eng},
+  pages     = {100868-},
+  publisher = {Elsevier B.V},
+  title     = {Major Advances in Particle Swarm Optimization: Theory, Analysis, and Application},
+  volume    = {63},
+  abstract  = {•Much is disclosed about the paradigm, theory, and development of PSO.•Relevant neighborhood topologies, fitness landscapes, and variants are addressed.•Various PSO-based complex optimization scenarios are discussed.•Key PSO practices are introduced to facilitate further future implementation.•A set of interesting open issues and potential future research lines are put forward.
+               Over the ages, nature has constantly been a rich source of inspiration for science, with much still to discover about and learn from. Swarm Intelligence (SI), a major branch of artificial intelligence, was rendered to model the collective behavior of social swarms in nature. Ultimately, Particle Swarm Optimization algorithm (PSO) is arguably one of the most popular SI paradigms. Over the past two decades, PSO has been applied successfully, with good return as well, in a wide variety of fields of science and technology with a wider range of complex optimization problems, thereby occupying a prominent position in the optimization field. However, through in-depth studies, a number of problems with the algorithm have been detected and identified; e.g., issues regarding convergence, diversity, and stability. Consequently, since its birth in the mid-1990s, PSO has witnessed a myriad of enhancements, extensions, and variants in various aspects of the algorithm, specifically after the twentieth century, and the related research has therefore now reached an impressive state. In this paper, a rigorous yet systematic review is presented to organize and summarize the information on the PSO algorithm and the developments and trends of its most basic as well as of some of the very notable implementations that have been introduced recently, bearing in mind the coverage of paradigm, theory, hybridization, parallelization, complex optimization, and the diverse applications of the algorithm, making it more accessible. Ease for researchers to determine which PSO variant is currently best suited or to be invented for a given optimization problem or application. This up-to-date review also highlights the current pressing issues and intriguing open challenges haunting PSO, prompting scholars and researchers to conduct further research both on the theory and application of the algorithm in the forthcoming years.},
+  author    = {Houssein, Essam H. and Gad, Ahmed G. and Hussain, Kashif and Suganthan, Ponnuthurai Nagaratnam},
+  copyright = {2021 Elsevier B.V.},
+  issn      = {2210-6502},
+  journal   = {Swarm and evolutionary computation}
+}
+
+@article{SinghaT.2012OoFu,
+  year      = {2012},
+  language  = {eng},
+  pages     = {825-829},
+  publisher = {Elsevier Ltd},
+  title     = {Optimization of Floor-Planning using Genetic Algorithm},
+  volume    = {4},
+  abstract  = {Floor-planning is one of the key design flow of VLSI chip designing process. This paper presents a novel approach to solve the VLSI floor planning problems. This approach is based on iterative prototypes optimization with evolved improvement (POEMS) algorithm. It uses a genetic algorithm (GA) for local search on each iteration, because both algorithms have already proven useful for solving similar problems. It adopts a non-slicing structure B* tree for the placement of rectangle modules. B*-trees are based on ordered binary trees. Inheriting from the nice properties of ordered binary trees, B*-trees are very easy for implementation and can perform the respective primitive tree operations, like search, insertion, and deletion in only O(1), O(1) and O(n) times respectively. While existing representations for non-slicing floor-plans need at least O(n) time for each of these operations, where n is the number of modules. GA has been implemented and tested on popular benchmark problems. Experimental results show that GA can quickly produce optimal solutions for all tested benchmark problems.},
+  author    = {Singha, T. and Dutta, H.S. and De, M.},
+  copyright = {2012},
+  issn      = {2212-0173},
+  journal   = {Procedia technology}
+}
+
+
+=============================Below are not cited================================
+@inproceedings{alexander2017evolution,
+  title     = {Evolution of artistic image variants through feature based diversity optimisation},
+  author    = {Alexander, Brad and Kortman, James and Neumann, Aneta},
+  booktitle = {Proceedings of the Genetic and Evolutionary Computation Conference},
+  pages     = {171--178},
+  year      = {2017}
+}
+
+@article{10.1145/3355089.3356556,
+  author     = {Wu, Wenming and Fu, Xiao-Ming and Tang, Rui and Wang, Yuhan and Qi, Yu-Hao and Liu, Ligang},
+  title      = {Data-driven interior plan generation for residential buildings},
+  year       = {2019},
+  issue_date = {December 2019},
+  publisher  = {Association for Computing Machinery},
+  address    = {New York, NY, USA},
+  volume     = {38},
+  number     = {6},
+  issn       = {0730-0301},
+  url        = {https://doi.org/10.1145/3355089.3356556},
+  doi        = {10.1145/3355089.3356556},
+  abstract   = {We propose a novel data-driven technique for automatically and efficiently generating floor plans for residential buildings with given boundaries. Central to this method is a two-stage approach that imitates the human design process by locating rooms first and then walls while adapting to the input building boundary. Based on observations of the presence of the living room in almost all floor plans, our designed learning network begins with positioning a living room and continues by iteratively generating other rooms. Then, walls are first determined by an encoder-decoder network, and then they are refined to vector representations using dedicated rules. To effectively train our networks, we construct RPLAN - a manually collected large-scale densely annotated dataset of floor plans from real residential buildings. Intensive experiments, including formative user studies and comparisons, are conducted to illustrate the feasibility and efficacy of our proposed approach. By comparing the plausibility of different floor plans, we have observed that our method substantially outperforms existing methods, and in many cases our floor plans are comparable to human-created ones.},
+  journal    = {ACM Trans. Graph.},
+  month      = nov,
+  articleno  = {234},
+  numpages   = {12},
+  keywords   = {data-driven approach, deep learning, floor plan generation, interior layout, neural network}
+}
+
+@inproceedings{9511363,
+  author    = {Lee, Philip K. and Stenger, Björn},
+  booktitle = {2021 17th International Conference on Machine Vision and Applications (MVA)},
+  title     = {Shape-Based Floor Plan Retrieval Using Parse Tree Matching},
+  year      = {2021},
+  volume    = {},
+  number    = {},
+  pages     = {1-5},
+  keywords  = {Measurement;Shape;Machine vision;Layout;Grammar;Floors},
+  doi       = {10.23919/MVA51890.2021.9511363}
 }

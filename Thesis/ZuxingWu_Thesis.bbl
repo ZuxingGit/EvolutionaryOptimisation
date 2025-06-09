@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{10.1007/11732242_56}
 A.~M. Brintrup, H.~Takagi, and J.~Ramsden.
@@ -23,12 +23,49 @@ A.~de~Almeida, B.~Taborda, F.~Santos, K.~Kwiecinski, and S.~Eloy.
 \newblock In {\em 2016 IEEE International Conference on Systems, Man, and
   Cybernetics (SMC)}, pages 002774--002778, 2016.
 
+\bibitem{HousseinEssamH.2021MAiP}
+E.~H. Houssein, A.~G. Gad, K.~Hussain, and P.~N. Suganthan.
+\newblock Major advances in particle swarm optimization: Theory, analysis, and
+  application.
+\newblock {\em Swarm and evolutionary computation}, 63:100868--, 2021.
+
+\bibitem{KangShinjin2022Fpof}
+S.~Kang and S.~K. Kim.
+\newblock Floor plan optimization for indoor environment based on multimodal
+  data.
+\newblock {\em The Journal of supercomputing}, 78(2):2724--2743, 2022.
+
+\bibitem{KennedyJ.1997Adbv}
+J.~Kennedy and R.~Eberhart.
+\newblock A discrete binary version of the particle swarm algorithm.
+\newblock In {\em 1997 IEEE International Conference on Systems, Man, and
+  Cybernetics. Computational Cybernetics and Simulation}, volume~5, pages
+  4104--4108 vol.5. IEEE, 1997.
+
+\bibitem{LaignelGraziella2021Fpgt}
+G.~Laignel, N.~Pozin, X.~Geffrier, L.~Delevaux, F.~Brun, and B.~Dolla.
+\newblock Floor plan generation through a mixed constraint programming-genetic
+  optimization approach.
+\newblock {\em Automation in construction}, 123:103491--, 2021.
+
 \bibitem{doi:10.1177/1478077119832982}
 M.~Nisztuk and P.~B. Myszkowski.
 \newblock Hybrid evolutionary algorithm applied to automated floor plan
   generation.
 \newblock {\em International Journal of Architectural Computing},
   17(3):260--283, 2019.
+
+\bibitem{10.5555/3666122.3666421}
+Y.~Shi, K.~Xue, L.~Song, and C.~Qian.
+\newblock Macro placement by wire-mask-guided black-box optimization.
+\newblock In {\em Proceedings of the 37th International Conference on Neural
+  Information Processing Systems}, NIPS '23, Red Hook, NY, USA, 2023. Curran
+  Associates Inc.
+
+\bibitem{SinghaT.2012OoFu}
+T.~Singha, H.~Dutta, and M.~De.
+\newblock Optimization of floor-planning using genetic algorithm.
+\newblock {\em Procedia technology}, 4:825--829, 2012.
 
 \bibitem{9675541}
 R.~Subramanian, T.~DheenaDayalan, T.~Badhrirajan, C.~Dhinakaran,
@@ -55,5 +92,18 @@ S.~Yan and N.~Liu.
 \newblock Computational design of residential units’ floor layout: A
   heuristic algorithm.
 \newblock {\em Journal of Building Engineering}, 96:110546, 2024.
+
+\bibitem{ZawidzkiMachi2020Moot}
+M.~Zawidzki and J.~Szklarski.
+\newblock Multi-objective optimization of the floor plan of a single story
+  family house considering position and orientation.
+\newblock {\em Advances in engineering software (1992)}, 141:102766--, 2020.
+
+\bibitem{ZouDexuan2024Amsa}
+D.~Zou, G.-G. Wang, A.~K. Sangaiah, and X.~Kong.
+\newblock A memory-based simulated annealing algorithm and a new auxiliary
+  function for the fixed-outline floorplanning with soft blocks.
+\newblock {\em Journal of ambient intelligence and humanized computing},
+  15(2):1613--1624, 2024.
 
 \end{thebibliography}

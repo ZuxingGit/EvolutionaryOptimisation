@@ -1,26 +1,27 @@
-\contentsline {section}{\numberline {1}Introduction}{3}{}%
-\contentsline {subsection}{\numberline {1.1}Aim}{3}{}%
-\contentsline {subsection}{\numberline {1.2}Motivation}{3}{}%
-\contentsline {section}{\numberline {2}Literature Review}{3}{}%
-\contentsline {section}{\numberline {3}Methodology}{5}{}%
-\contentsline {subsection}{\numberline {3.1}Population Initialization}{5}{}%
-\contentsline {subsection}{\numberline {3.2}Representation of Floor Plans}{5}{}%
-\contentsline {subsection}{\numberline {3.3}Evolutionary Optimization Framework}{5}{}%
-\contentsline {subsection}{\numberline {3.4}Fitness Function Design}{6}{}%
-\contentsline {section}{\numberline {4}Plan vs Progress}{7}{}%
-\contentsline {subsection}{\numberline {4.1}Research Plan}{7}{}%
-\contentsline {subsection}{\numberline {4.2}Progress}{9}{}%
-\contentsline {subsubsection}{\numberline {4.2.1}PSO algorithm + MCTS algorithm}{9}{}%
-\contentsline {subsubsection}{\numberline {4.2.2}MCTS algorithm replaced by (1+1) EA}{9}{}%
-\contentsline {subsubsection}{\numberline {4.2.3}Tune inertia weight}{9}{}%
-\contentsline {subsubsection}{\numberline {4.2.4}PSO algorithm replaced by (1+1) EA}{10}{}%
-\contentsline {subsubsection}{\numberline {4.2.5}Swap two random rooms}{10}{}%
-\contentsline {subsubsection}{\numberline {4.2.6}Prioritized fitness calculation}{10}{}%
-\contentsline {subsubsection}{\numberline {4.2.7}Remove windows and doors}{11}{}%
-\contentsline {subsubsection}{\numberline {4.2.8}Change land size and orientation}{11}{}%
-\contentsline {subsubsection}{\numberline {4.2.9}Dotted line for open space}{12}{}%
-\contentsline {subsubsection}{\numberline {4.2.10}Tune weights}{12}{}%
-\contentsline {section}{\numberline {5}Experimental Results}{12}{}%
-\contentsline {section}{\numberline {6}Conclusion}{12}{}%
-\contentsline {section}{\numberline {7}Plagiarism Declaration}{12}{}%
-\contentsline {section}{\numberline {8}References}{12}{}%
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Aim}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Motivation}{3}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Literature Review}{3}{section.2}%
+\contentsline {section}{\numberline {3}Methodology}{5}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Representation of Floor Plans}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Solution Evaluation}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Population Initialisation}{8}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Evolutionary Optimisation Framework}{8}{subsection.3.4}%
+\contentsline {section}{\numberline {4}Plan vs Progress}{10}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Research Plan}{10}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Progress}{12}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}PSO algorithm + MCTS algorithm}{12}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2}MCTS algorithm replaced by (1+1) EA}{13}{subsubsection.4.2.2}%
+\contentsline {subsubsection}{\numberline {4.2.3}Swap two random rooms}{13}{subsubsection.4.2.3}%
+\contentsline {subsubsection}{\numberline {4.2.4}Tune inertia weight}{14}{subsubsection.4.2.4}%
+\contentsline {subsubsection}{\numberline {4.2.5}Prioritized fitness calculation}{15}{subsubsection.4.2.5}%
+\contentsline {subsubsection}{\numberline {4.2.6}Change land size and orientation}{15}{subsubsection.4.2.6}%
+\contentsline {subsubsection}{\numberline {4.2.7}Remove windows and doors}{16}{subsubsection.4.2.7}%
+\contentsline {subsubsection}{\numberline {4.2.8}PSO algorithm replaced by (1+1) EA}{17}{subsubsection.4.2.8}%
+\contentsline {subsubsection}{\numberline {4.2.9}Dotted line for open space}{17}{subsubsection.4.2.9}%
+\contentsline {subsubsection}{\numberline {4.2.10}Tune weights for fitness functions}{17}{subsubsection.4.2.10}%
+\contentsline {section}{\numberline {5}Experimental Results}{18}{section.5}%
+\contentsline {section}{\numberline {6}Conclusion}{19}{section.6}%
+\contentsline {section}{\numberline {7}Future Work}{19}{section.7}%
+\contentsline {section}{\numberline {8}Plagiarism Declaration}{19}{section.8}%
+\contentsline {section}{\numberline {9}References}{20}{section.9}%
