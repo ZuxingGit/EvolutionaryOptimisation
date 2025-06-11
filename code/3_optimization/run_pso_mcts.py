@@ -1149,9 +1149,9 @@ def fitness_partial(house):
     fitness = 0
     penalty = 0
     if check_GAR_side(house) == 0:
-        penalty += 1
+        penalty += 2
     if check_no_entry_touch(house) == 0:
-        penalty += 0.5
+        penalty += 0.9
     if bigger_MBR(house) == 0:
         penalty += 0.8
 
@@ -1181,7 +1181,7 @@ def fitness_partial(house):
             + 0.5 * (1 - dis_GAR_KIC(house))
             + dis_MBR_LR(house)
             + dis_MBR_KIC(house)
-            + utilization_rate(house) * 8
+            + utilization_rate(house) * 10
         )
 
     # fitness += diff_public_private(house)
@@ -1229,6 +1229,205 @@ def fitness_all(house):
         )
 
     return fitness
+
+
+# Move all rooms to the nearest edge (left, right, top, or bottom) without overlap
+def move_rooms_to_edges(house):
+    for room in house.rooms:
+        # Try each direction
+        for direction in ["left", "right", "up", "down"]:
+            while True:
+                # Calculate new position
+                new_x, new_y = room.x, room.y
+                if direction == "left":
+                    new_x -= 1
+                elif direction == "right":
+                    new_x += 1
+                elif direction == "up":
+                    new_y += 1
+                elif direction == "down":
+                    new_y -= 1
+                # Create new polygon for the room
+                new_polygon = Polygon(
+                    [
+                        (new_x, new_y),
+                        (new_x + room.width, new_y),
+                        (new_x + room.width, new_y + room.depth),
+                        (new_x, new_y + room.depth),
+                    ]
+                )
+                # Check if new position is valid (within boundary and no overlap)
+                if not house.boundary.contains(new_polygon):
+                    break
+                overlap = False
+                for other in house.rooms:
+                    if other is not room and new_polygon.intersects(
+                        other.get_polygon()
+                    ):
+                        overlap = True
+                        break
+                if overlap:
+                    break
+                # Update room position
+                room.x, room.y = new_x, new_y
+
+
+# Expand public rooms (KIC, LR, DR) into adjacent blank space without overlap
+def expand_public_rooms(house):
+    public_names = ["KIC", "LR", "DR"]
+    for room in house.rooms:
+        if room.name not in public_names:
+            continue
+        # Try to expand in all four directions
+        for direction in ["left", "right", "up", "down"]:
+            while True:
+                # Prepare new polygon for expansion
+                if direction == "left":
+                    new_x = room.x - 1
+                    new_width = room.width + 1
+                    new_polygon = Polygon(
+                        [
+                            (new_x, room.y),
+                            (new_x + new_width, room.y),
+                            (new_x + new_width, room.y + room.depth),
+                            (new_x, room.y + room.depth),
+                        ]
+                    )
+                elif direction == "right":
+                    new_x = room.x
+                    new_width = room.width + 1
+                    new_polygon = Polygon(
+                        [
+                            (new_x, room.y),
+                            (new_x + new_width, room.y),
+                            (new_x + new_width, room.y + room.depth),
+                            (new_x, room.y + room.depth),
+                        ]
+                    )
+                elif direction == "up":
+                    new_y = room.y
+                    new_depth = room.depth + 1
+                    new_polygon = Polygon(
+                        [
+                            (room.x, new_y),
+                            (room.x + room.width, new_y),
+                            (room.x + room.width, new_y + new_depth),
+                            (room.x, new_y + new_depth),
+                        ]
+                    )
+                elif direction == "down":
+                    new_y = room.y - 1
+                    new_depth = room.depth + 1
+                    new_polygon = Polygon(
+                        [
+                            (room.x, new_y),
+                            (room.x + room.width, new_y),
+                            (room.x + room.width, new_y + new_depth),
+                            (room.x, new_y + new_depth),
+                        ]
+                    )
+                # Check if expansion is valid
+                if not house.boundary.contains(new_polygon):
+                    break
+                overlap = False
+                for other in house.rooms:
+                    if other is not room and new_polygon.overlaps(other.get_polygon()):
+                        overlap = True
+                        break
+                if overlap:
+                    break
+                # Update room position and size
+                if direction == "left":
+                    room.x -= 1
+                    room.width += 1
+                elif direction == "right":
+                    room.width += 1
+                elif direction == "up":
+                    room.depth += 1
+                elif direction == "down":
+                    room.y -= 1
+                    room.depth += 1
+
+
+def expand_other_rooms(house):
+    public_names = ["KIC", "LR", "DR"]
+    for room in house.rooms:
+        if room.name in public_names:
+            continue
+        # Try to expand in all four directions
+        for direction in ["left", "right", "up", "down"]:
+            while True:
+                # Prepare new polygon for expansion
+                if direction == "left":
+                    new_x = room.x - 1
+                    new_width = room.width + 1
+                    new_polygon = Polygon(
+                        [
+                            (new_x, room.y),
+                            (new_x + new_width, room.y),
+                            (new_x + new_width, room.y + room.depth),
+                            (new_x, room.y + room.depth),
+                        ]
+                    )
+                elif direction == "right":
+                    new_x = room.x
+                    new_width = room.width + 1
+                    new_polygon = Polygon(
+                        [
+                            (new_x, room.y),
+                            (new_x + new_width, room.y),
+                            (new_x + new_width, room.y + room.depth),
+                            (new_x, room.y + room.depth),
+                        ]
+                    )
+                elif direction == "up":
+                    new_y = room.y
+                    new_depth = room.depth + 1
+                    new_polygon = Polygon(
+                        [
+                            (room.x, new_y),
+                            (room.x + room.width, new_y),
+                            (room.x + room.width, new_y + new_depth),
+                            (room.x, new_y + new_depth),
+                        ]
+                    )
+                elif direction == "down":
+                    new_y = room.y - 1
+                    new_depth = room.depth + 1
+                    new_polygon = Polygon(
+                        [
+                            (room.x, new_y),
+                            (room.x + room.width, new_y),
+                            (room.x + room.width, new_y + new_depth),
+                            (room.x, new_y + new_depth),
+                        ]
+                    )
+                # Check if expansion is valid
+                if not house.boundary.contains(new_polygon):
+                    break
+                overlap = False
+                for other in house.rooms:
+                    if other is not room and new_polygon.overlaps(other.get_polygon()):
+                        overlap = True
+                        break
+                if overlap:
+                    break
+                # Update room position and size
+                if direction == "left":
+                    room.x -= 1
+                    room.width += 1
+                elif direction == "right":
+                    room.width += 1
+                elif direction == "up":
+                    room.depth += 1
+                elif direction == "down":
+                    room.y -= 1
+                    room.depth += 1
+
+
+# Example usage after your main optimisation:
+# move_rooms_to_edges(house)
+# expand_public_rooms(house)
 
 
 # Parameters
@@ -2075,6 +2274,22 @@ class Size_OnePlusOneEA:
                 )
             i += 1
 
+        if self.best_fitness >= 2.8:
+            # move rooms to edges
+            # move_rooms_to_edges(self.best_layout)
+            # expand the public rooms
+            expand_public_rooms(self.best_layout)
+            expand_other_rooms(self.best_layout)
+            save_snapshots(
+                current_time,
+                self.best_layout,
+                "final_adjusted",
+                self.best_fitness,
+                0,
+                0,
+                0,
+            )
+
         return self.best_layout, self.best_fitness
 
 
@@ -2082,29 +2297,29 @@ class Size_OnePlusOneEA:
 if __name__ == "__main__":
     # Record start time for 1+1 EA
     start_time_ea = time.time()
-    size_one_plus_OneEA = Size_OnePlusOneEA(boundary, rooms_range, max_iter=30000)
+    size_one_plus_OneEA = Size_OnePlusOneEA(boundary, rooms_range, max_iter=20000)
     size_one_plus_OneEA.search()
     end_time_ea = time.time()
 
-    # Record start time for PSO_OnePlusOneEA
-    start_time_pso = time.time()
-    pso_1P1EA = PSO_OnePlusOneEA(
-        rooms_range, num_particles=100, max_iter=30000, mcts_iter=150
-    )
-    pso_1P1EA.optimize(boundary)
-    end_time_pso = time.time()
+    # # Record start time for PSO_OnePlusOneEA
+    # start_time_pso = time.time()
+    # pso_1P1EA = PSO_OnePlusOneEA(
+    #     rooms_range, num_particles=100, max_iter=30000, mcts_iter=150
+    # )
+    # pso_1P1EA.optimize(boundary)
+    # end_time_pso = time.time()
 
-    # Record start time for PSO_MCTS
-    start_time_pso_mcts = time.time()
-    pso_mcts = PSO_MCTS(rooms_range, num_particles=100, max_iter=30000, mcts_iter=150)
-    pso_mcts.optimize(boundary)
-    end_time_pso_mcts = time.time()
+    # # Record start time for PSO_MCTS
+    # start_time_pso_mcts = time.time()
+    # pso_mcts = PSO_MCTS(rooms_range, num_particles=100, max_iter=30000, mcts_iter=150)
+    # pso_mcts.optimize(boundary)
+    # end_time_pso_mcts = time.time()
 
     # Plot fitness history
     plt.figure(figsize=(10, 6))
     plt.plot(size_one_plus_OneEA.fitness_history, label="1+1 EA")
-    plt.plot(pso_1P1EA.fitness_history, label="PSO-(1+1)EA")
-    plt.plot(pso_mcts.fitness_history, label="PSO-MCTS")
+    # plt.plot(pso_1P1EA.fitness_history, label="PSO-(1+1)EA")
+    # plt.plot(pso_mcts.fitness_history, label="PSO-MCTS")
     plt.xlabel("Iterations")
     plt.ylabel("Fitness")
     plt.title("Fitness Comparison Between 3 Algorithm Combinations")
@@ -2115,7 +2330,7 @@ if __name__ == "__main__":
 
     # Print execution times
     print(f"1+1 EA execution time: {end_time_ea - start_time_ea:.2f} seconds")
-    print(f"PSO-(1+1)EA execution time: {end_time_pso - start_time_pso:.2f} seconds")
-    print(
-        f"PSO-MCTS execution time: {end_time_pso_mcts - start_time_pso_mcts:.2f} seconds"
-    )
+    # print(f"PSO-(1+1)EA execution time: {end_time_pso - start_time_pso:.2f} seconds")
+    # print(
+    #     f"PSO-MCTS execution time: {end_time_pso_mcts - start_time_pso_mcts:.2f} seconds"
+    # )
