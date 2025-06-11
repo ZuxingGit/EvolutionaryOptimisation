@@ -442,6 +442,15 @@ In the earlier design phase, the open space in the floor plan was represented by
 \subsubsection{Tune weights for fitness functions}
 In the final stages of the optimisation process, I have been tuning the weights of the fitness functions to achieve better results. The weights are used to balance the importance of different criteria in the evaluation process. By adjusting the weights, I can prioritise certain aspects of the design, such as low overlap or high utilization rate, to achieve better overall results. This tuning process is iterative and may require multiple rounds of testing and evaluation to find the optimal balance for the specific design goals.
 
+\subsection{Filling Blank Areas}
+In the final stages of the optimisation process, I have been working on filling blank areas in the floor plan. The goal is to improve the overall layout and utilisation of space by expanding rooms into adjacent blank areas. This process involves heuristically expanding rooms to four directions (up, down, left, right) until they reach the boundary of the house or another room (see Figure~\ref{fig:fill-blank}). The expansion is done in a way that maintains the overall structure and flow of the floor plan while maximising the use of available space. This approach helps to create a more efficient and functional layout, making better use of the available area.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/fill-blank.png}
+    \caption{Filling blank areas in the floor plan. The left one is the original final floor plan, and the right one is the floor plan after filling blank areas.}
+    \label{fig:fill-blank}
+\end{figure}
+
 \section{Experimental Results}
 From the line chart in Figure~\ref{fig:compare-3algorithm}, it can be seen that the fitness value of the floor plan has been improved significantly after about 2000 iterations using PSO-(1+1) EA and dual (1+1) EA, except PSO-MCTS.\@ When running the PSO-MCTS algorithm, the fitness value gets stuck at 2.7, which means it is struggling on reaching an utilisation rate of 0.8. It cannot break through the local optimum even after 30000 iterations.
 \begin{figure}[h]
