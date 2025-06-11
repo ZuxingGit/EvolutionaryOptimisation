@@ -20,8 +20,9 @@
 \contentsline {subsubsection}{\numberline {4.2.8}PSO algorithm replaced by (1+1) EA}{17}{subsubsection.4.2.8}%
 \contentsline {subsubsection}{\numberline {4.2.9}Dotted line for open space}{17}{subsubsection.4.2.9}%
 \contentsline {subsubsection}{\numberline {4.2.10}Tune weights for fitness functions}{17}{subsubsection.4.2.10}%
+\contentsline {subsection}{\numberline {4.3}Filling Blank Areas}{18}{subsection.4.3}%
 \contentsline {section}{\numberline {5}Experimental Results}{18}{section.5}%
 \contentsline {section}{\numberline {6}Conclusion}{19}{section.6}%
 \contentsline {section}{\numberline {7}Future Work}{19}{section.7}%
-\contentsline {section}{\numberline {8}Plagiarism Declaration}{19}{section.8}%
-\contentsline {section}{\numberline {9}References}{20}{section.9}%
+\contentsline {section}{\numberline {8}Plagiarism Declaration}{20}{section.8}%
+\contentsline {section}{\numberline {9}References}{21}{section.9}%
