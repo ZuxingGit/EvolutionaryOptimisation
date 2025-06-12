@@ -215,6 +215,10 @@ class House:
             ) and self.is_facing_inside_public(room, direction):
                 options.append(direction)
         if not options:
+            if not self.is_facing_outside(room, direction):
+                options.append(direction)
+
+        if not options:
             return None
 
         wall = random.choice(options)
@@ -300,13 +304,15 @@ class House:
         if side == "left":
             wall = LineString([(room.x, room.y), (room.x, room.y + room.depth)])
             for other_room in self.rooms:
-                if (
-                    other_room.name != room.name
-                    and other_room.name != "LR"
-                    and other_room.name != "DR"
-                    and other_room.name != "KIC"
-                ):
-                    if wall.intersects(other_room.get_polygon()):
+                if other_room.name != room.name and other_room.name not in [
+                    "LR",
+                    "DR",
+                    "KIC",
+                    "LDR",
+                ]:
+                    if wall.intersects(other_room.get_polygon()) and wall.intersection(
+                        other_room.get_polygon()
+                    ).geom_type not in ["Point", "MultiPoint"]:
                         return False
 
         elif side == "right":
@@ -317,13 +323,15 @@ class House:
                 ]
             )
             for other_room in self.rooms:
-                if (
-                    other_room.name != room.name
-                    and other_room.name != "LR"
-                    and other_room.name != "DR"
-                    and other_room.name != "KIC"
-                ):
-                    if wall.intersects(other_room.get_polygon()):
+                if other_room.name != room.name and other_room.name not in [
+                    "LR",
+                    "DR",
+                    "KIC",
+                    "LDR",
+                ]:
+                    if wall.intersects(other_room.get_polygon()) and wall.intersection(
+                        other_room.get_polygon()
+                    ).geom_type not in ["Point", "MultiPoint"]:
                         return False
 
         elif side == "top":
@@ -334,25 +342,29 @@ class House:
                 ]
             )
             for other_room in self.rooms:
-                if (
-                    other_room.name != room.name
-                    and other_room.name != "LR"
-                    and other_room.name != "DR"
-                    and other_room.name != "KIC"
-                ):
-                    if wall.intersects(other_room.get_polygon()):
+                if other_room.name != room.name and other_room.name not in [
+                    "LR",
+                    "DR",
+                    "KIC",
+                    "LDR",
+                ]:
+                    if wall.intersects(other_room.get_polygon()) and wall.intersection(
+                        other_room.get_polygon()
+                    ).geom_type not in ["Point", "MultiPoint"]:
                         return False
 
         elif side == "bottom":
             wall = LineString([(room.x, room.y), (room.x + room.width, room.y)])
             for other_room in self.rooms:
-                if (
-                    other_room.name != room.name
-                    and other_room.name != "LR"
-                    and other_room.name != "DR"
-                    and other_room.name != "KIC"
-                ):
-                    if wall.intersects(other_room.get_polygon()):
+                if other_room.name != room.name and other_room.name not in [
+                    "LR",
+                    "DR",
+                    "KIC",
+                    "LDR",
+                ]:
+                    if wall.intersects(other_room.get_polygon()) and wall.intersection(
+                        other_room.get_polygon()
+                    ).geom_type not in ["Point", "MultiPoint"]:
                         return False
 
         return True
@@ -1440,7 +1452,7 @@ mcts_iter = 150
 def draw_windows_doors(room, ax):
     for window in room.windows:
         x, y = window.coordinates.xy
-        ax.plot(x, y, color="blue", linewidth=2, alpha=1.0)
+        ax.plot(x, y, color="blue", linewidth=3, alpha=1.0)
 
     for door in room.doors:
         x, y = door.coordinates.xy
@@ -2279,7 +2291,11 @@ class Size_OnePlusOneEA:
             # move_rooms_to_edges(self.best_layout)
             # expand the public rooms
             expand_public_rooms(self.best_layout)
+            # expand other rooms
             expand_other_rooms(self.best_layout)
+            # generate doors and windows
+            self.best_layout.generate_doors_windows()
+            # save the final adjusted layout
             save_snapshots(
                 current_time,
                 self.best_layout,
