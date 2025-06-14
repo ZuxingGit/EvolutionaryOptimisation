@@ -1831,10 +1831,16 @@ class PSO_MCTS:
             random.randint(int(min_d), int(max_d)),  # Ensure depth is an integer
         ]
 
-    def optimize(self, boundary):
+    def optimize(self, boundary, start_time=None, max_time=None):
         current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
         print(f"PSO_MCTS started at {current_time}")
+
+        if start_time is None:
+            start_time = time.time()
         for _ in range(self.max_iter):
+            if max_time is not None and time.time() - start_time > max_time:
+                print("Timeout reached, stopping early.")
+                break
             is_gbest_updated = False
             # Evaluate fitness for each particle
             for index, particle in enumerate(self.particles):
@@ -1969,10 +1975,15 @@ class PSO_OnePlusOneEA:
             random.randint(int(min_d), int(max_d)),  # Ensure depth is an integer
         ]
 
-    def optimize(self, boundary):
+    def optimize(self, boundary, start_time=None, max_time=None):
+        if start_time is None:
+            start_time = time.time()
         current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
         print(f"PSO_OnePlusOneEA started at {current_time}")
         for _ in range(self.max_iter):
+            if max_time is not None and time.time() - start_time > max_time:
+                print("Timeout reached, stopping early.")
+                break
             is_gbest_updated = False
             # Evaluate fitness for each particle
             for index, particle in enumerate(self.particles):
@@ -2086,7 +2097,7 @@ class Position_OnePlusOneEA:
         self.best_layout = None
         self.best_fitness = -float("inf")
 
-    def search(self):
+    def search(self, start_time=None, max_time=None):
         # Initialize the first layout
         placed_rooms = []
         legal_positions_array = []
@@ -2117,8 +2128,14 @@ class Position_OnePlusOneEA:
         self.best_layout = new_layout
         self.best_fitness = fitness_partial(new_layout)
         # print("Initial fitness:", self.best_fitness)
+
+        if start_time is None:
+            start_time = time.time()
         # Iterate to find the best layout
         for j in range(self.max_iter):
+            if max_time is not None and time.time() - start_time > max_time:
+                print("Timeout reached, stopping early.")
+                break
             for i, room in enumerate(placed_rooms):
                 # Generate a mutation rate [0, 1]
                 mutation_rate = random.uniform(0, 1)
@@ -2179,7 +2196,9 @@ class Size_OnePlusOneEA:
         self.best_fitness = -float("inf")
         self.fitness_history = []  # List to store fitness values
 
-    def search(self):
+    def search(self, start_time=None, max_time=None):
+        if start_time is None:
+            start_time = time.time()
         current_time = datetime.now().strftime("%Y%m%d-%H%M%S")
         # 0. generate the first layout
         rooms = []
@@ -2190,6 +2209,9 @@ class Size_OnePlusOneEA:
 
         # 1. randomly mutate room(s)' width and depth
         for i in range(self.max_iter):
+            if max_time is not None and time.time() - start_time > max_time:
+                print("Timeout reached, stopping early.")
+                break
             rooms = self.best_layout_rooms.copy()
             for j, room in enumerate(rooms):
                 # generate a mutation rate [0, 1]
@@ -2309,44 +2331,94 @@ class Size_OnePlusOneEA:
         return self.best_layout, self.best_fitness
 
 
-# Main function to compare algorithms
-if __name__ == "__main__":
-    # Record start time for 1+1 EA
-    start_time_ea = time.time()
-    size_one_plus_OneEA = Size_OnePlusOneEA(boundary, rooms_range, max_iter=20000)
-    size_one_plus_OneEA.search()
-    end_time_ea = time.time()
+# Timeout settings
+MAX_TIME = 3600  # 1 hour in seconds
+# MAX_TIME = 7200  # 2 hours in seconds
+N_RUNS = 5
 
-    # # Record start time for PSO_OnePlusOneEA
-    # start_time_pso = time.time()
-    # pso_1P1EA = PSO_OnePlusOneEA(
-    #     rooms_range, num_particles=100, max_iter=30000, mcts_iter=150
-    # )
-    # pso_1P1EA.optimize(boundary)
-    # end_time_pso = time.time()
 
-    # # Record start time for PSO_MCTS
-    # start_time_pso_mcts = time.time()
-    # pso_mcts = PSO_MCTS(rooms_range, num_particles=100, max_iter=30000, mcts_iter=150)
-    # pso_mcts.optimize(boundary)
-    # end_time_pso_mcts = time.time()
+def run_with_timeout(algo_class, *args, **kwargs):
+    best_fitness_list = []
+    for run in range(N_RUNS):
+        start_time = time.time()
+        algo = algo_class(*args, **kwargs)
+        # input start_time & max_time
+        if hasattr(algo, "search"):
+            algo.search(start_time=start_time, max_time=MAX_TIME)
+        else:
+            algo.optimize(boundary, start_time=start_time, max_time=MAX_TIME)
+        if hasattr(algo, "gbest_fitness"):
+            best_fitness_list.append(algo.gbest_fitness)
+            print(f"Run {run+1}: best fitness = {algo.gbest_fitness}")
+        else:
+            best_fitness_list.append(algo.best_fitness)
+            print(f"Run {run+1}: best fitness = {algo.best_fitness}")
+    return best_fitness_list
 
-    # Plot fitness history
-    plt.figure(figsize=(10, 6))
-    plt.plot(size_one_plus_OneEA.fitness_history, label="1+1 EA")
-    # plt.plot(pso_1P1EA.fitness_history, label="PSO-(1+1)EA")
-    # plt.plot(pso_mcts.fitness_history, label="PSO-MCTS")
-    plt.xlabel("Iterations")
-    plt.ylabel("Fitness")
-    plt.title("Fitness Comparison Between 3 Algorithm Combinations")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig("fitness_comparison.png")
-    plt.show()
 
-    # Print execution times
-    print(f"1+1 EA execution time: {end_time_ea - start_time_ea:.2f} seconds")
-    # print(f"PSO-(1+1)EA execution time: {end_time_pso - start_time_pso:.2f} seconds")
-    # print(
-    #     f"PSO-MCTS execution time: {end_time_pso_mcts - start_time_pso_mcts:.2f} seconds"
-    # )
+# run 3 combinations of algorithms
+results = {}
+
+results["2*(1+1)EA"] = run_with_timeout(
+    Size_OnePlusOneEA, boundary, rooms_range, max_iter=30000
+)
+
+results["PSO-(1+1)EA"] = run_with_timeout(
+    PSO_OnePlusOneEA, rooms_range, 100, 30000, 150
+)
+
+results["PSO-MCTS"] = run_with_timeout(PSO_MCTS, rooms_range, 100, 30000, 150)
+
+# calculate and save the results
+with open("algorithm_comparison.txt", "w") as f:
+    for name, fitness_list in results.items():
+        arr = np.array(fitness_list)
+        f.write(f"{name}\n")
+        f.write(f"max: {arr.max():.4f}\n")
+        f.write(f"average: {arr.mean():.4f}\n")
+        f.write(f"std: {arr.std():.4f}\n")
+        f.write(f"all: {arr.tolist()}\n\n")
+        print(f"{name}: max={arr.max():.4f}, ave={arr.mean():.4f}, std={arr.std():.4f}")
+
+
+# # Main function to compare algorithms
+# if __name__ == "__main__":
+#     # Record start time for 1+1 EA
+#     start_time_ea = time.time()
+#     size_one_plus_OneEA = Size_OnePlusOneEA(boundary, rooms_range, max_iter=20000)
+#     size_one_plus_OneEA.search()
+#     end_time_ea = time.time()
+
+#     # # Record start time for PSO_OnePlusOneEA
+#     # start_time_pso = time.time()
+#     # pso_1P1EA = PSO_OnePlusOneEA(
+#     #     rooms_range, num_particles=100, max_iter=30000, mcts_iter=150
+#     # )
+#     # pso_1P1EA.optimize(boundary)
+#     # end_time_pso = time.time()
+
+#     # # Record start time for PSO_MCTS
+#     # start_time_pso_mcts = time.time()
+#     # pso_mcts = PSO_MCTS(rooms_range, num_particles=100, max_iter=30000, mcts_iter=150)
+#     # pso_mcts.optimize(boundary)
+#     # end_time_pso_mcts = time.time()
+
+#     # Plot fitness history
+#     plt.figure(figsize=(10, 6))
+#     plt.plot(size_one_plus_OneEA.fitness_history, label="1+1 EA")
+#     # plt.plot(pso_1P1EA.fitness_history, label="PSO-(1+1)EA")
+#     # plt.plot(pso_mcts.fitness_history, label="PSO-MCTS")
+#     plt.xlabel("Iterations")
+#     plt.ylabel("Fitness")
+#     plt.title("Fitness Comparison Between 3 Algorithm Combinations")
+#     plt.legend()
+#     plt.grid(True)
+#     plt.savefig("fitness_comparison.png")
+#     plt.show()
+
+#     # Print execution times
+#     print(f"1+1 EA execution time: {end_time_ea - start_time_ea:.2f} seconds")
+#     # print(f"PSO-(1+1)EA execution time: {end_time_pso - start_time_pso:.2f} seconds")
+#     # print(
+#     #     f"PSO-MCTS execution time: {end_time_pso_mcts - start_time_pso_mcts:.2f} seconds"
+#     # )
