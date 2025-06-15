@@ -33,52 +33,71 @@
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
 \newlabel{fig:representation_hierarchy}{{1}{6}{Hierarchical representation of the floor plan data structure}{figure.caption.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Solution Evaluation}{6}{subsection.3.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces List of 24 Fitness Functions (Dark green means eventually being used)}}{7}{table.caption.3}\protected@file@percent }
-\newlabel{tab:fitness_functions}{{1}{7}{List of 24 Fitness Functions (Dark green means eventually being used)}{table.caption.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces List of 24 Fitness Functions (Green means eventually being used)}}{7}{table.caption.3}\protected@file@percent }
+\newlabel{tab:fitness_functions}{{1}{7}{List of 24 Fitness Functions (Green means eventually being used)}{table.caption.3}{}}
 \citation{YAN2024110546}
 \citation{YAN2024110546,KennedyJ.1997Adbv}
 \citation{HousseinEssamH.2021MAiP}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Population Initialisation}{8}{subsection.3.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Evolutionary Optimisation Framework}{8}{subsection.3.4}\protected@file@percent }
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces : (1+1) EA for Mutating Room Positions}}{9}{algorithm.1}\protected@file@percent }
-\newlabel{alg:1+1-ea-position}{{1}{9}{: (1+1) EA for Mutating Room Positions}{algorithm.1}{}}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces : (1+1) EA for Mutating Room Sizes}}{10}{algorithm.2}\protected@file@percent }
-\newlabel{alg:1+1-ea-size}{{2}{10}{: (1+1) EA for Mutating Room Sizes}{algorithm.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Plan vs Progress}{10}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Research Plan}{10}{subsection.4.1}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces : PSO-MCTS Hybrid Algorithm}}{9}{algorithm.1}\protected@file@percent }
+\newlabel{alg:pso-mcts}{{1}{9}{: PSO-MCTS Hybrid Algorithm}{algorithm.1}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces : (1+1) EA for Mutating Room Positions}}{10}{algorithm.2}\protected@file@percent }
+\newlabel{alg:1+1-ea-position}{{2}{10}{: (1+1) EA for Mutating Room Positions}{algorithm.2}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces : (1+1) EA for Mutating Room Sizes}}{11}{algorithm.3}\protected@file@percent }
+\newlabel{alg:1+1-ea-size}{{3}{11}{: (1+1) EA for Mutating Room Sizes}{algorithm.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Plan vs Progress}{11}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Research Plan}{11}{subsection.4.1}\protected@file@percent }
 \gtt@chartextrasize{0}{94.85434pt}
 \gtt@chartextrasize{1}{86.67383pt}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Progress}{12}{subsection.4.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}PSO algorithm + MCTS algorithm}{12}{subsubsection.4.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}MCTS algorithm replaced by (1+1) EA}{13}{subsubsection.4.2.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Example of room overlap after 2000 PSO-MCTS iterations. (Bold black line is the entry.)}}{13}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:mcts_overlap}{{2}{13}{Example of room overlap after 2000 PSO-MCTS iterations. (Bold black line is the entry.)}{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.3}Swap two random rooms}{13}{subsubsection.4.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Progress}{13}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.1}PSO algorithm + MCTS algorithm}{13}{subsubsection.4.2.1}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces : Monte Carlo Tree Search (MCTS) for Floor Plan Layout}}{14}{algorithm.4}\protected@file@percent }
+\newlabel{alg:mcts}{{4}{14}{: Monte Carlo Tree Search (MCTS) for Floor Plan Layout}{algorithm.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.2}MCTS algorithm replaced by (1+1) EA}{15}{subsubsection.4.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Example of room overlap after 2000 PSO-MCTS iterations. (Bold black line is the entry.)}}{15}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:mcts_overlap}{{2}{15}{Example of room overlap after 2000 PSO-MCTS iterations. (Bold black line is the entry.)}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.3}Swap two random rooms}{15}{subsubsection.4.2.3}\protected@file@percent }
 \citation{HousseinEssamH.2021MAiP}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Less room overlap after using swap mutation.}}{14}{figure.caption.5}\protected@file@percent }
-\newlabel{fig:swap-rooms}{{3}{14}{Less room overlap after using swap mutation}{figure.caption.5}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.4}Tune inertia weight}{14}{subsubsection.4.2.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.5}Prioritized fitness calculation}{15}{subsubsection.4.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.6}Change land size and orientation}{15}{subsubsection.4.2.6}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Example of prioritised fitness calculation. The left one is still working on reducing overlap rate. Utilization rate is only calculated for floor plans with zero overlap rate (the right one). (Bold blue lines are windows; bold brown lines are doors)}}{16}{figure.caption.6}\protected@file@percent }
-\newlabel{fig:prioritized-fitness}{{4}{16}{Example of prioritised fitness calculation. The left one is still working on reducing overlap rate. Utilization rate is only calculated for floor plans with zero overlap rate (the right one). (Bold blue lines are windows; bold brown lines are doors)}{figure.caption.6}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.7}Remove windows and doors}{16}{subsubsection.4.2.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.8}PSO algorithm replaced by (1+1) EA}{17}{subsubsection.4.2.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.9}Dotted line for open space}{17}{subsubsection.4.2.9}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Example of open space surrounded by dotted line.}}{17}{figure.caption.7}\protected@file@percent }
-\newlabel{fig:open-space-dotted-line}{{5}{17}{Example of open space surrounded by dotted line}{figure.caption.7}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.10}Tune weights for fitness functions}{17}{subsubsection.4.2.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Filling Blank Areas}{18}{subsection.4.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Filling blank areas in the floor plan. The left one is the original final floor plan, and the right one is the floor plan after filling blank areas.}}{18}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:fill-blank}{{6}{18}{Filling blank areas in the floor plan. The left one is the original final floor plan, and the right one is the floor plan after filling blank areas}{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Experimental Results}{18}{section.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Fitness comparison between 3 Algorithm Combinations.}}{19}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:compare-3algorithm}{{7}{19}{Fitness comparison between 3 Algorithm Combinations}{figure.caption.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Comparison of Execution Time and Best Fitness}}{19}{table.caption.10}\protected@file@percent }
-\newlabel{tab:algorithm_comparison}{{2}{19}{Comparison of Execution Time and Best Fitness}{table.caption.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{19}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Future Work}{19}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Plagiarism Declaration}{20}{section.8}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Less room overlap after using swap mutation.}}{16}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:swap-rooms}{{3}{16}{Less room overlap after using swap mutation}{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.4}Tune inertia weight}{16}{subsubsection.4.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.5}Prioritized fitness calculation}{17}{subsubsection.4.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.6}Change land size and orientation}{17}{subsubsection.4.2.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Example of prioritised fitness calculation. The left one is still working on reducing overlap rate. Utilization rate is only calculated for floor plans with zero overlap rate (the right one). (Bold blue lines are windows; bold brown lines are doors)}}{18}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:prioritized-fitness}{{4}{18}{Example of prioritised fitness calculation. The left one is still working on reducing overlap rate. Utilization rate is only calculated for floor plans with zero overlap rate (the right one). (Bold blue lines are windows; bold brown lines are doors)}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.7}Remove windows and doors}{18}{subsubsection.4.2.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.8}PSO algorithm replaced by (1+1) EA}{19}{subsubsection.4.2.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.9}Dotted line for open space}{19}{subsubsection.4.2.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Example of open space surrounded by dotted line.}}{19}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:open-space-dotted-line}{{5}{19}{Example of open space surrounded by dotted line}{figure.caption.7}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.10}Tune weights for fitness functions}{19}{subsubsection.4.2.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.11}Filling Blank Areas}{20}{subsubsection.4.2.11}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Filling blank areas in the floor plan. The left one is the original final floor plan, and the right one is the floor plan after filling blank areas.}}{20}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:fill-blank}{{6}{20}{Filling blank areas in the floor plan. The left one is the original final floor plan, and the right one is the floor plan after filling blank areas}{figure.caption.8}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {5}{\ignorespaces : Expand Public Rooms to Fill Blank Areas}}{20}{algorithm.5}\protected@file@percent }
+\newlabel{alg:expand-public-rooms}{{5}{20}{: Expand Public Rooms to Fill Blank Areas}{algorithm.5}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {6}{\ignorespaces : Expand Other Rooms to Fill Blank Areas}}{21}{algorithm.6}\protected@file@percent }
+\newlabel{alg:expand-other-rooms}{{6}{21}{: Expand Other Rooms to Fill Blank Areas}{algorithm.6}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.2.12}Add windows and doors}{21}{subsubsection.4.2.12}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Final floor plan with windows and doors. (Bold blue lines are windows; bold brown lines are doors)}}{21}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:add-door-window}{{7}{21}{Final floor plan with windows and doors. (Bold blue lines are windows; bold brown lines are doors)}{figure.caption.9}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {7}{\ignorespaces : Generate Windows for Rooms}}{22}{algorithm.7}\protected@file@percent }
+\newlabel{alg:generate-window}{{7}{22}{: Generate Windows for Rooms}{algorithm.7}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {8}{\ignorespaces : Generate Doors for Rooms}}{23}{algorithm.8}\protected@file@percent }
+\newlabel{alg:generate-door}{{8}{23}{: Generate Doors for Rooms}{algorithm.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experimental Results}{23}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Run same iterations for 3 Algorithm Combinations}{23}{subsection.5.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Fitness comparison between 3 Algorithm Combinations.}}{24}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:compare-3algorithm}{{8}{24}{Fitness comparison between 3 Algorithm Combinations}{figure.caption.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Comparison of Execution Time and Best Fitness}}{24}{table.caption.11}\protected@file@percent }
+\newlabel{tab:algorithm_comparison}{{2}{24}{Comparison of Execution Time and Best Fitness}{table.caption.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Comparison by running same amount of time}{24}{subsection.5.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Statistical Comparison of Algorithm Performance (5 runs, 1 hour per run)}}{25}{table.caption.12}\protected@file@percent }
+\newlabel{tab:statistical_comparison}{{3}{25}{Statistical Comparison of Algorithm Performance (5 runs, 1 hour per run)}{table.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Same amount of iterations \& One more bedroom}{25}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{25}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Future Work}{25}{section.7}\protected@file@percent }
 \bibstyle{abbrv}
 \bibdata{MyReferences}
 \bibcite{10.1007/11732242_56}{1}
@@ -90,12 +109,15 @@
 \bibcite{LaignelGraziella2021Fpgt}{7}
 \bibcite{doi:10.1177/1478077119832982}{8}
 \bibcite{10.5555/3666122.3666421}{9}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Plagiarism Declaration}{26}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}References}{26}{section.9}\protected@file@percent }
 \bibcite{SinghaT.2012OoFu}{10}
 \bibcite{9675541}{11}
-\@writefile{toc}{\contentsline {section}{\numberline {9}References}{21}{section.9}\protected@file@percent }
 \bibcite{WANG20051329}{12}
 \bibcite{WANG2023100238}{13}
 \bibcite{YAN2024110546}{14}
 \bibcite{ZawidzkiMachi2020Moot}{15}
 \bibcite{ZouDexuan2024Amsa}{16}
-\gdef \@abspage@last{22}
+\@writefile{toc}{\contentsline {section}{\numberline {A}Appendix}{27}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}Code}{27}{subsection.A.1}\protected@file@percent }
+\gdef \@abspage@last{27}

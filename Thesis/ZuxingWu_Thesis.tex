@@ -125,7 +125,7 @@ Fitness functions will evaluate each floor plan mainly based on these 4 criteria
 privacy, comfort, practicality, convenience. We created 24 fitness functions based on Wang and Duan's evaluation indicators~\cite{WANG2023100238} along with professional's advice. Our fitness functions are shown in Table~\ref{tab:fitness_functions}.
 \begin{table}[h]
     \centering
-    \caption{List of 24 Fitness Functions (Dark green means eventually being used)}
+    \caption{List of 24 Fitness Functions (Green means eventually being used)}
     \label{tab:fitness_functions}
     \begin{tabularx}{\textwidth}{l l}
         \hline
@@ -210,11 +210,46 @@ The first step in the evolutionary process is to generate an initial population 
 The rooms are assigned random sizes within the specified ranges and placed within the house boundary. The initialisation strategy is designed to produce a diverse set of floor plans that serve as a starting point for the evolutionary optimisation process. At the late stage of our research, we only need to randomly generate a single floor plan, which will be mutated and evaluated continuously so as to evolve the floor plan towards an optimal solution.
 
 \subsection{Evolutionary Optimisation Framework}
-The evolutionary optimisation framework initially was based on particle swarm optimisation (PSO) algorithm, which is suitable for optimising the size of rooms due to parallel processing, and Monte Carlo Tree Search (MCTS) algorithm which can handle discrete variables (i.e., room position)~\cite{YAN2024110546}. In our implementation, the width and depth are integer values, which means we are using discrete binary particle swarm optimisation (BPSO) algorithm~\cite{YAN2024110546, KennedyJ.1997Adbv}. The topology of this type PSO algorithm is a von Neumann topology~\cite{HousseinEssamH.2021MAiP}, where each particle is connected to its neighbours in a grid-like structure. The PSO algorithm updates the velocity and position of each particle based on its own best position and the best position of its neighbours. The velocity update equation is given by:
+The evolutionary optimisation framework initially was based on particle swarm optimisation (PSO) algorithm, which is suitable for optimising the size of rooms due to parallel processing, and Monte Carlo Tree Search (MCTS) algorithm which can handle discrete variables (i.e., room position)~\cite{YAN2024110546}. In our implementation, the width and depth are integer values, which means we are using discrete binary particle swarm optimisation (BPSO) algorithm~\cite{YAN2024110546, KennedyJ.1997Adbv}. The topology of this type PSO algorithm is a von Neumann topology~\cite{HousseinEssamH.2021MAiP}, where each particle is connected to its neighbours in a grid-like structure. The PSO algorithm (see Algorithm~\ref{alg:pso-mcts}) updates the velocity and position of each particle based on its own best position and the best position of its neighbours. The velocity update equation is given by:
 \begin{equation*}
     v_i(t+1) = w(t) \cdot v_i(t) + c_1 \cdot r_1 \cdot (p_i - x_i(t)) + c_2 \cdot r_2 \cdot (g - x_i(t))
 \end{equation*}
 where $v_i(t)$ is the velocity of particle $i$ at time $t$, $w(t)$ is the inertia weight, $c_1$ and $c_2$ are the cognitive and social coefficients, respectively, $r_1$ and $r_2$ are random numbers uniformly distributed in [0, 1], $p_i$ is the best position of particle $i$, and $g$ is the global best position among all particles.
+
+\begin{algorithm}[H]
+    \caption{: PSO-MCTS Hybrid Algorithm}
+    \label{alg:pso-mcts}
+    \begin{algorithmic}[1]
+        \REQUIRE Room size ranges, number of particles $N$, maximum iterations $T$, MCTS iterations $M$
+        \STATE Initialise each particle with random room sizes and zero velocities
+        \STATE Set global best fitness $g_{best}$ to $-\infty$
+        \FOR{$t = 1$ to $T$}
+        \FOR{each particle $i$}
+        \STATE Construct room list from particle's sizes
+        \STATE Use MCTS to generate a layout for these sizes
+        \STATE Evaluate fitness of the layout
+        \IF{fitness $>$ particle's personal best}
+        \STATE Update particle's personal best
+        \ENDIF
+        \IF{fitness $>$ $g_{best}$}
+        \STATE Update global best layout and fitness
+        \ENDIF
+        \ENDFOR
+        \STATE \textbf{Local search:} Swap two random rooms in $g_{best}$ layout, accept if fitness improves
+        \STATE Record $g_{best}$ fitness in history
+        \FOR{each particle $i$}
+        \FOR{each room dimension $j$}
+        \STATE Update velocity using inertia, cognitive, and social terms
+        \STATE Update room size within allowed bounds
+        \ENDFOR
+        \ENDFOR
+        \IF{$t$ is 0, $T-1$, or divisible by 25}
+        \STATE Save snapshot of current $g_{best}$ layout
+        \ENDIF
+        \ENDFOR
+        \RETURN Best layout found
+    \end{algorithmic}
+\end{algorithm}
 
 However, the MCTS algorithm did not optimise the room position very well, so it was replaced by a simple greedy algorithm called (1+1) Evolutionary Algorithm (EA). The (1+1) EA algorithm (see Algorithm~\ref{alg:1+1-ea-position}) is a simple evolutionary algorithm that maintains a single individual and applies mutation to generate new individuals. The PSO algorithm will be used to optimise the size of rooms, while the (1+1) EA will be used to optimise the room position. The framework will involve the application of genetic operators, such as randomly add or minus a small perturbation to the current room size, swap two random rooms, and so on, to generate new floor plans from the existing population. The optimisation process will be repeated for a specified number of generations or until a termination criterion is met.
 
@@ -361,7 +396,63 @@ Last summer holiday, I have completed the solution representation and solution e
 Fitness functions are designed to evaluate the quality of the generated floor plans based on various criteria, such as privacy, comfort, practicality, and convenience. The evaluation process involves calculating the fitness values for each floor plan in the population and selecting the best individuals for particles updating their velocity and position in PSO.
 
 \subsubsection{PSO algorithm + MCTS algorithm}
-From the start of semester 1 of 2025, I have been working on the evolutionary optimisation process. Initially, I focused on the PSO algorithm, which is suitable for optimising the size of rooms due to parallel processing, and MCTS algorithm, which handles discrete variables (i.e., room position). I had implemented the PSO algorithm and MCTS algorithm in Python, and I tried integrating them into a single framework. The integration process involves combining the two algorithms to create a hybrid optimisation approach that can effectively handle both continuous and discrete variables in the floor plan design process.
+From the start of semester 1 of 2025, I have been working on the evolutionary optimisation process. Initially, I focused on the PSO algorithm, which is suitable for optimising the size of rooms due to parallel processing, and MCTS algorithm, which handles discrete variables (i.e., room position). I had implemented the PSO algorithm (Algorithm~\ref{alg:pso-mcts}) and MCTS algorithm (Algorithm~\ref{alg:mcts}) in Python, and I tried integrating them into a single framework. The integration process involves combining the two algorithms to create a hybrid optimisation approach that can effectively handle both continuous and discrete variables in the floor plan design process.
+\begin{algorithm}[H]
+    \caption{: Monte Carlo Tree Search (MCTS) for Floor Plan Layout}
+    \label{alg:mcts}
+    \begin{algorithmic}[1]
+        \REQUIRE Boundary, List of Rooms, Number of Iterations $N$
+        \STATE Initialise root node with empty layout state
+        \FOR{$i = 1$ to $N$}
+        \STATE Set node $\gets$ root, state $\gets$ copy of root state
+
+        \COMMENT{\texttt{\# Selection}}
+        \WHILE{node is fully expanded and not terminal}
+        \STATE node $\gets$ child with highest UCB score
+        \IF{placing node.action fails}
+        \STATE \textbf{break} (invalid simulation)
+        \ENDIF
+        \ENDWHILE
+
+        \COMMENT{\texttt{\# Expansion}}
+        \IF{node has untried actions}
+        \STATE Randomly select an untried action
+        \IF{placing action succeeds}
+        \STATE Add new child node for this action
+        \STATE node $\gets$ new child
+        \ENDIF
+        \ENDIF
+
+        \COMMENT{\texttt{\# Simulation}}
+        \STATE Copy current state to simulation\_state
+        \WHILE{not all rooms placed and attempts $<$ max\_attempts}
+        \STATE Randomly select a legal action
+        \IF{placing action fails}
+        \STATE \textbf{break} (invalid simulation)
+        \ENDIF
+        \ENDWHILE
+
+        \COMMENT{\texttt{\# Evaluation}}
+        \IF{simulation is valid and all rooms placed}
+        \STATE Compute reward using fitness function
+        \IF{reward $>$ best\_reward}
+        \STATE Update best\_reward and best\_state
+        \ENDIF
+        \ELSE
+        \STATE reward $\gets 0$
+        \ENDIF
+
+        \COMMENT{\texttt{\# Backpropagation}}
+        \WHILE{node is not None}
+        \STATE node.visits $+=$ 1
+        \STATE node.value $+=$ reward
+        \STATE node $\gets$ node.parent
+        \ENDWHILE
+        \ENDFOR
+        \RETURN Layout from best\_state or best child of root
+    \end{algorithmic}
+\end{algorithm}
+
 
 \subsubsection{MCTS algorithm replaced by (1+1) EA}
 However, the integration process has proven to be more complex than anticipated, and the MCTS algorithm did not optimise the room position very well. It cannot eliminate overlap even after 2000 iterations (see Figure~\ref{fig:mcts_overlap}) (bold black line means entry).
@@ -442,8 +533,8 @@ In the earlier design phase, the open space in the floor plan was represented by
 \subsubsection{Tune weights for fitness functions}
 In the final stages of the optimisation process, I have been tuning the weights of the fitness functions to achieve better results. The weights are used to balance the importance of different criteria in the evaluation process. By adjusting the weights, I can prioritise certain aspects of the design, such as low overlap or high utilization rate, to achieve better overall results. This tuning process is iterative and may require multiple rounds of testing and evaluation to find the optimal balance for the specific design goals.
 
-\subsection{Filling Blank Areas}
-In the final stages of the optimisation process, I have been working on filling blank areas in the floor plan. The goal is to improve the overall layout and utilisation of space by expanding rooms into adjacent blank areas. This process involves heuristically expanding rooms to four directions (up, down, left, right) until they reach the boundary of the house or another room (see Figure~\ref{fig:fill-blank}). The expansion is done in a way that maintains the overall structure and flow of the floor plan while maximising the use of available space. This approach helps to create a more efficient and functional layout, making better use of the available area.
+\subsubsection{Filling Blank Areas}
+In the final stages of the optimisation process, I have been working on filling blank areas in the floor plan. The goal is to improve the overall layout and utilisation of space by expanding rooms into adjacent blank areas. This process involves heuristically expanding public areas first (Algorithm~\ref{alg:expand-public-rooms}), and then closed rooms (Algorithm~\ref{alg:expand-other-rooms}) to four directions (up, down, left, right) until they reach the boundary of the house or another room (see example result in Figure~\ref{fig:fill-blank}). The expansion is done in a way that maintains the overall structure and flow of the floor plan while maximising the use of available space. This approach helps to create a more efficient and functional layout, making better use of the available area.
 \begin{figure}[h]
     \centering
     \includegraphics[width=1\textwidth]{images/fill-blank.png}
@@ -451,7 +542,107 @@ In the final stages of the optimisation process, I have been working on filling 
     \label{fig:fill-blank}
 \end{figure}
 
+\begin{algorithm}[H]
+    \caption{: Expand Public Rooms to Fill Blank Areas}
+    \label{alg:expand-public-rooms}
+    \begin{algorithmic}[1]
+        \REQUIRE House layout with all rooms placed
+        \STATE Define public room types: Kitchen, Living Room, Dining Room
+        \FOR{each room in house}
+        \IF{room is a public room}
+        \FOR{each direction in [left, right, up, down]}
+        \WHILE{room can be expanded by 1 unit in this direction without overlap and still within boundary}
+        \STATE Expand room by 1 unit in this direction
+        \ENDWHILE
+        \ENDFOR
+        \ENDIF
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{: Expand Other Rooms to Fill Blank Areas}
+    \label{alg:expand-other-rooms}
+    \begin{algorithmic}[1]
+        \REQUIRE House layout with all rooms placed
+        \STATE Define public room types: Kitchen, Living Room, Dining Room
+        \FOR{each room in house}
+        \IF{room is \textbf{not} a public room}
+        \FOR{each direction in [left, right, up, down]}
+        \WHILE{room can be expanded by 1 unit in this direction without overlap and still within boundary}
+        \STATE Expand room by 1 unit in this direction
+        \ENDWHILE
+        \ENDFOR
+        \ENDIF
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Add windows and doors}
+After filling the blank areas, I added a post-processing step to place windows and doors in each room. Windows and doors are added according to design criteria and constraints, such as their width and position relative to the rooms and the house. This step enhances the aesthetics and functionality of the floor plan by providing natural light and ventilation. An example of the final floor plan with windows and doors is shown in Figure~\ref{fig:add-door-window}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/add-door-window.png}
+    \caption{Final floor plan with windows and doors. (Bold blue lines are windows; bold brown lines are doors)}
+    \label{fig:add-door-window}
+\end{figure}
+
+Windows are placed on room sides that face outside, while doors are added to walls between rooms. Both are represented as lines in the floor plan, with properties such as width and position. Importantly, windows and doors are only added after the optimisation process is complete, ensuring they do not interfere with the optimisation of room sizes and positions.
+
+The algorithms for generating windows and doors are shown in Algorithm~\ref{alg:generate-window} and Algorithm~\ref{alg:generate-door}. Window placement is based on exterior-facing walls, and door placement is based on walls between rooms. The width and position of each window and door are randomly determined within allowed ranges, ensuring they fit within the room and meet design constraints.
+\begin{algorithm}[H]
+    \caption{: Generate Windows for Rooms}
+    \label{alg:generate-window}
+    \begin{algorithmic}[1]
+        \FOR{each room in the house}
+        \IF{room is not a garage}
+        \STATE Initialise empty window list for the room
+        \STATE Find all sides of the room that face outside
+        \IF{there is at least one such side}
+        \STATE Randomly select one side as the wall for the window
+        \STATE Randomly determine window width within allowed range and not exceed the room size
+        \STATE Randomly determine window position along the selected wall
+        \STATE Add window to the room
+        \ENDIF
+        \ENDIF
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+    \caption{: Generate Doors for Rooms}
+    \label{alg:generate-door}
+    \begin{algorithmic}[1]
+        \FOR{each room in the house}
+        \IF{room is not kitchen, living room, or dining room}
+        \STATE Initialise empty door list for the room
+        \STATE Find all sides of the room that do not face outside and are adjacent to public areas
+        \IF{there is at least one such side}
+        \STATE Randomly select one side as the wall for the door
+        \STATE Randomly determine door width within allowed range and not exceed the room size
+        \STATE Randomly determine door position along the selected wall
+        \STATE Add door to the room
+        \ELSE
+        \FOR{each direction}
+        \IF{the side does not face outside}
+        \STATE Add this direction to options
+        \ENDIF
+        \ENDFOR
+        \IF{options is not empty}
+        \STATE Randomly select one side from options as the wall for the door
+        \STATE Randomly determine door width and position as above
+        \STATE Add door to the room
+        \ENDIF
+        \ENDIF
+        \ENDIF
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
 \section{Experimental Results}
+\subsection{Run same iterations for 3 Algorithm Combinations}
+To compare the performance of different algorithm combinations, I ran three different algorithms for 30,000 iterations each. The first algorithm is a dual (1+1) EA approach, which uses two (1+1) EAs to optimise room positions and sizes separately. The second algorithm is a PSO-(1+1) EA combination, where PSO optimises room sizes and (1+1) EA optimises room positions. The third algorithm is a PSO-MCTS combination, where PSO optimises room sizes and MCTS optimises room positions.
+
 From the line chart in Figure~\ref{fig:compare-3algorithm}, it can be seen that the fitness value of the floor plan has been improved significantly after about 2000 iterations using PSO-(1+1) EA and dual (1+1) EA, except PSO-MCTS.\@ When running the PSO-MCTS algorithm, the fitness value gets stuck at 2.7, which means it is struggling on reaching an utilisation rate of 0.8. It cannot break through the local optimum even after 30000 iterations.
 \begin{figure}[h]
     \centering
@@ -467,14 +658,37 @@ The PSO-(1+1) EA algorithm attains a fitness value of 16.26 after 30,000 iterati
     \label{tab:algorithm_comparison}
     \begin{tabularx}{\textwidth}{l | l | l}
         \hline
-        \textbf{Method}      & \textbf{Execution Time} & \textbf{Best Fitness} \\
+        \textbf{Method} & \textbf{Execution Time} & \textbf{Best Fitness} \\
         \hline
-        (1+1) EA -- (1+1) EA & 22 min 31 sec           & 14.53                 \\
-        PSO--(1+1) EA        & 42 hr 19 min 30 sec     & 16.26                 \\
-        PSO--MCTS            & 133 hr 33 min 30 sec    & 2.7                   \\
+        Dual (1+1) EA   & 22 min 31 sec           & 14.53                 \\
+        PSO--(1+1) EA   & 42 hr 19 min 30 sec     & 16.26                 \\
+        PSO--MCTS       & 133 hr 33 min 30 sec    & 2.7                   \\
         \hline
     \end{tabularx}
 \end{table}
+
+\subsection{Comparison by running same amount of time}
+To further evaluate the performance and stability of each algorithm, I conducted five independent runs for each of the three algorithm combinations, with each run limited to a maximum execution time of one hour. For each run, the highest fitness value achieved was recorded. The maximum, average, and standard deviation (std) of the best fitness values were then calculated for each algorithm. The results are summarised in Table~\ref{tab:statistical_comparison}.
+
+\begin{table}[h]
+    \centering
+    \caption{Statistical Comparison of Algorithm Performance (5 runs, 1 hour per run)}
+    \label{tab:statistical_comparison}
+    \begin{tabularx}{\textwidth}{l | l | l | l}
+        \hline
+        \textbf{Method} & \textbf{Max Fitness} & \textbf{Average Fitness} & \textbf{Std} \\
+        \hline
+        Dual (1+1) EA   & 16.5113              & 13.2129                  & 5.6406       \\
+        PSO-(1+1) EA    & 19.0984              & 15.4169                  & 6.3322       \\
+        PSO-MCTS        & 1.9400               & 1.9209                   & 0.0112       \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+These results show that both (1+1) EA-based methods can achieve significantly higher fitness values than PSO-MCTS within the same time limit. However, the standard deviations for the (1+1) EA-based methods are also larger, indicating greater variability in their performance across different runs. In contrast, PSO-MCTS is much more stable but consistently achieves lower fitness values. This suggests that while the (1+1) EA-based approaches are more effective at finding high-quality solutions, their results may be less consistent from run to run.
+
+\subsection{Same amount of iterations \& One more bedroom}
+To further evaluate the robustness of three algorithm combinations, I ran each algorithm for up to 1 hour each and recorded the best fitness value achieved.
 
 \section{Conclusion}
 In this thesis, I have presented the progress of my research on optimising residential floor plans using evolutionary algorithms. The research focuses on the representation of floor plans, evaluation of solutions, and the application of evolutionary optimisation techniques. The initial plan was to use a combination of PSO and MCTS algorithms, but due to the limitations of the MCTS algorithm in optimising room positions, I switched to a (1+1) EA approach. The optimisation process has shown promising results, with significant improvements in fitness values after 2000 iterations.
@@ -485,7 +699,6 @@ Future work will focus on further enhancing the optimisation process by explorin
 
 Planned improvements include:
 \begin{itemize}
-    \item Filling blank areas or moving rooms to one side to improve space utilization and layout efficiency.
     \item Explicitly representing corridors in the floor plan to ensure better connectivity and circulation.
     \item Incorporating corridors, doors, and windows into the evaluation process, so their placement and properties are considered in the fitness calculation.
     \item Applying other algorithms, such as simulated annealing and differential evolution, to further explore the solution space and escape local optima.
@@ -495,9 +708,14 @@ Planned improvements include:
 \section{Plagiarism Declaration}
 I hereby declare that this submission is my own work and to the best of my knowledge, it contains no material previously published or written by another person, except where due to acknowledgement is made. Furthermore, I believe that it contains no material which has been accepted for the award of other degree or diploma in any university or other tertiary institutions.
 
-\newpage
+% \newpage
 \bibliographystyle{abbrv}
 \bibliography{MyReferences}
+
+\appendix
+\section{Appendix}
+\subsection{Code}
+Our code is available on GitHub: \url{https://github.com/ZuxingGit/EvolutionaryOptimisation/blob/main/code/3_optimization/run_pso_mcts.py}
 
 \end{document}
 
