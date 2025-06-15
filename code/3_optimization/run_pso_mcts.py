@@ -42,6 +42,7 @@ rooms_range = [
     ("KIC", 3, 4, 3, 4),  # Kitchen
     ("MBR", 3, 6, 3, 6),  # Master Bedroom
     ("BR1", 3, 5, 3, 5),  # Bedroom
+    ("BR2", 3, 5, 3, 5),  # Bedroom
     ("BA", 2, 4, 2, 4),  # Bathroom
     # ("STR", 1, 2, 1, 2),  # Storage Room
     # ("BR2", 3, 5, 3, 5),  # Bedroom2
