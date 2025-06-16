@@ -44,7 +44,7 @@ rooms_range = [
     ("BR1", 3, 5, 3, 5),  # Bedroom
     ("BR2", 3, 5, 3, 5),  # Bedroom
     ("BA", 2, 4, 2, 4),  # Bathroom
-    # ("STR", 1, 2, 1, 2),  # Storage Room
+    ("STR", 1, 2, 1, 2),  # Storage Room
     # ("BR2", 3, 5, 3, 5),  # Bedroom2
     # ("HW", 2, 10, 1, 2),  # Hallway
     # ("BAL", 2, 8, 1, 2),  # Balcony
@@ -2360,15 +2360,15 @@ def run_with_timeout(algo_class, *args, **kwargs):
 # run 3 combinations of algorithms
 results = {}
 
-results["2*(1+1)EA"] = run_with_timeout(
-    Size_OnePlusOneEA, boundary, rooms_range, max_iter=30000
+results["Dual (1+1)EA"] = run_with_timeout(
+    Size_OnePlusOneEA, boundary, rooms_range, max_iter=int(1e9)
 )
 
 results["PSO-(1+1)EA"] = run_with_timeout(
-    PSO_OnePlusOneEA, rooms_range, 100, 30000, 150
+    PSO_OnePlusOneEA, rooms_range, 100, int(1e9), 150
 )
 
-results["PSO-MCTS"] = run_with_timeout(PSO_MCTS, rooms_range, 100, 30000, 150)
+results["PSO-MCTS"] = run_with_timeout(PSO_MCTS, rooms_range, 100, int(1e9), 150)
 
 # calculate and save the results
 with open("algorithm_comparison.txt", "w") as f:
