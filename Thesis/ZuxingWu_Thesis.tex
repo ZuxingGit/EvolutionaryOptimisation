@@ -32,7 +32,7 @@
     emph={__init__}, % list function keywords or names here
     emphstyle=\color{purple} % set your preferred function name color here
 }
-\usepackage[colorlinks=true, linkcolor=blue, citecolor=cyan, urlcolor=cyan]{hyperref}
+\usepackage[colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue]{hyperref}
 
 %\usepackage{setspace}
 %%\singlespacing
@@ -63,30 +63,29 @@
 
 \section{Introduction}
 \subsection{Aim}
-Residential floor plan design is a multifaceted and challenging task that necessitates careful consideration of factors such as room dimensions, spatial adjacency, privacy, convenience, and orientation. Conventional approaches to floor plan design are often time-consuming and labour-intensive, frequently resulting in suboptimal outcomes. Evolutionary algorithms have emerged as a promising alternative for optimising floor plans, as they are capable of efficiently exploring the design space and generating high-quality solutions. This project aims to develop an improved method for optimising residential floor plans through the application of evolutionary algorithms, addressing several limitations identified in previous research. The proposed approach utilises a novel and straightforward representation scheme, with the fitness of each floor plan evaluated according to multiple criteria, including privacy, comfort, practicality, and convenience. The findings of this research are expected to advance the field of residential floor plan design and offer valuable insights into the application of evolutionary algorithms to architectural design challenges.
+Residential floor plan design is a complex and challenging task that requires careful consideration of factors such as room dimensions, spatial adjacency, privacy, convenience, and orientation. Traditional approaches to floor plan design are often time-consuming and labour-intensive, frequently resulting in suboptimal outcomes. Evolutionary algorithms have emerged as a promising alternative for optimising floor plans, as they can efficiently explore the design space and generate high-quality solutions. This project aims to develop an improved method for optimising residential floor plans through the application of evolutionary algorithms, addressing several limitations identified in previous research. The proposed approach utilises a novel and straightforward representation scheme, with the fitness of each floor plan evaluated according to multiple criteria, including privacy, comfort, practicality, and convenience. The findings of this research are expected to advance the field of residential floor plan design and offer valuable insights into the application of evolutionary algorithms to architectural design challenges.
 
 \subsection{Motivation}
-Residential floor plan design constitutes a fundamental component of architectural practice, encompassing the spatial arrangement of rooms, windows, doors, corridors, and ancillary spaces within a dwelling. The configuration of a floor plan profoundly influences the functionality, convenience, comfort, ventilation, and energy efficiency of a residential building. Conventional approaches to floor plan design typically rely on manual drafting or computer-aided design (CAD) tools, processes that are often both time-consuming and labour-intensive. Furthermore, such methods may yield suboptimal outcomes, as they are heavily dependent on the subjective judgment and experience of individual designers.
+Residential floor plan design is a fundamental component of architectural practice, involving the spatial arrangement of rooms, windows, doors, corridors, and ancillary spaces within a dwelling. The configuration of a floor plan significantly influences the functionality, convenience, comfort, ventilation, and energy efficiency of a residential building. Traditional approaches to floor plan design typically rely on manual drafting or computer-aided design (CAD) tools, which are often both time-consuming and labour-intensive. Furthermore, such methods may yield suboptimal outcomes, as they are heavily dependent on the subjective judgment and experience of individual designers.
 
 In contrast, evolutionary algorithms provide a systematic and effective means for optimising floor plans by thoroughly exploring the design space and generating high-quality solutions. These algorithms are inspired by the principles of natural evolution, operating on a population of candidate solutions and utilising mechanisms such as crossover and mutation to iteratively improve design quality across generations. The performance of each candidate solution is rigorously evaluated using fitness functions, which quantitatively assess the extent to which the design satisfies the specified objectives of the floor plan optimisation problem.
 
 \section{Literature Review}
-Previous research has explored the application of evolutionary algorithms to optimise residential floor plans. Brintrup et al.~\cite{10.1007/11732242_56} compared three interactive genetic algorithms (i.e., sequential IGA, multi-objective IGA, parallel IGA) on a multi-objective floor planning task, and found that the multi-objective IGA provides more diverse results and faster convergence for optimising floor plans. They developed interactive evolutionary algorithms that allow designers to incorporate their preferences and constraints into the optimisation process. This method has shown promising results in generating floor plans that meet both functional and aesthetic requirements.
+Previous research has explored the application of evolutionary algorithms to optimise residential floor plans. Brintrup et al.~\cite{10.1007/11732242_56} compared three interactive genetic algorithms (i.e., sequential IGA, multi-objective IGA, and parallel IGA) on a multi-objective floor planning task, finding that the multi-objective IGA provides more diverse results and achieves faster convergence for floor plan optimisation. They developed interactive evolutionary algorithms that allow designers to incorporate their preferences and constraints into the optimisation process. This method has shown promising results in generating floor plans that meet both functional and aesthetic requirements.
 
-It was found that proportional roulette wheel selection is the best parent selection method for the mating pool, and k-point crossover is the most effective for fitness evolutionary improvement~\cite{7844659}.
-Combining evolutionary algorithms with greedy-like algorithms can help find near-optimal solutions in Automated Floor Plan Generation (AFPG), though it is a simplified model of multi-objective optimisation by linear composition of the partial evaluation functions~\cite{doi:10.1177/1478077119832982}. Subramanian et al.~\cite{9675541} used a genetic algorithm with KD tree models in a web application to generate floor plans for even non-expert users.
+It was found that proportional roulette wheel selection is the most effective parent selection method for the mating pool, and k-point crossover is the most effective for improving fitness during evolution~\cite{7844659}. Combining evolutionary algorithms with greedy-like algorithms can help find near-optimal solutions in Automated Floor Plan Generation (AFPG), although this approach simplifies multi-objective optimisation by linearly combining partial evaluation functions~\cite{doi:10.1177/1478077119832982}. Subramanian et al.~\cite{9675541} used a genetic algorithm with KD tree models in a web application to generate floor plans accessible even to non-expert users.
 
-Wang and Duan~\cite{WANG2023100238} tried to optimise floor plan design by focusing on energy consumption and consumer satisfaction, proving that the preferences of different types of consumers differed significantly. Therefore, different evaluation criteria are needed for satisfying different family types~\cite{WANG2023100238}. The quality and efficiency of residential floor plan design can be improved by combining Monte Carlo tree search algorithm (MCTS) and particle swarm optimisation (PSO)~\cite{YAN2024110546}. The MCTS algorithm takes human experience into consideration so that it can compress the search space and improve the efficiency of the search process~\cite{YAN2024110546}. The PSO algorithm can handle continuous variables and is suitable for optimising the size of rooms due to parallel processing~\cite{YAN2024110546}.
+Wang and Duan~\cite{WANG2023100238} attempted to optimise floor plan design by focusing on energy consumption and consumer satisfaction, demonstrating that the preferences of different types of consumers vary significantly. Therefore, different evaluation criteria are needed to satisfy different family types. The quality and efficiency of residential floor plan design can be improved by combining the Monte Carlo Tree Search (MCTS) algorithm and Particle Swarm Optimisation (PSO)~\cite{YAN2024110546}. The MCTS algorithm incorporates human experience, which helps compress the search space and improve search efficiency~\cite{YAN2024110546}. The PSO algorithm can handle continuous variables and is suitable for optimising room sizes due to its parallel processing capability~\cite{YAN2024110546}.
 
-Energy consumption, probable uniformity (PU), and spatial useful daylight illuminance (sUDI) are three objectives that are considered in Chaichi and Andaji Garmaroodi's optimisation process~\cite{CHAICHI2024108842} using NSGA-II algorithm, and the results show that the NSGA-II algorithm can provide a set of more sustainable floor plans that requires less computational power and time. Reliable metrics for evaluating the amount of light and the uniformity of light are tested in the optimisation process, and can avoid unwanted convergence because they restrict each other~\cite{CHAICHI2024108842}.
+Energy consumption, probable uniformity (PU), and spatial useful daylight illuminance (sUDI) are three objectives considered in Chaichi and Andaji Garmaroodi's optimisation process~\cite{CHAICHI2024108842} using the NSGA-II algorithm. The results show that NSGA-II can provide a set of more sustainable floor plans that require less computational power and time. Reliable metrics for evaluating the amount and uniformity of light are tested in the optimisation process, which can help avoid unwanted convergence by imposing mutual restrictions~\cite{CHAICHI2024108842}.
 
-Shi et al.~\cite{10.5555/3666122.3666421} chose (1+1)-EA (Evolutionary Algorithm) to optimise macro placement by randomly selecting two macros and exchange their coordinate, which only keep one solution and iteratively improves it. Laignel et al.~\cite{LaignelGraziella2021Fpgt} proposes a novel constraint programming-genetic algorithm for automatic apartment layout generation, demonstrating its ability to produce architecturally valid floor plans within a minute by discretizing space into a grid and solving layout assignments under complex constraints.
+Shi et al.~\cite{10.5555/3666122.3666421} chose the (1+1) Evolutionary Algorithm (EA) to optimise macro placement by randomly selecting two macros and exchanging their coordinates, maintaining only one solution and iteratively improving it. Laignel et al.~\cite{LaignelGraziella2021Fpgt} proposed a novel constraint programming-genetic algorithm for automatic apartment layout generation, demonstrating its ability to produce architecturally valid floor plans within a minute by discretising space into a grid and solving layout assignments under complex constraints.
 
-Zou et al.~\cite{ZouDexuan2024Amsa} proposes a memory-based simulated annealing algorithm for fixed-outline floor planning with soft blocks, using a memory pool and geometric auxiliary function to escape local optima and efficiently meet design constraints, showing superior performance on benchmarks. Both Zou~\cite{ZouDexuan2024Amsa} and Singha~\cite{SinghaT.2012OoFu} used B*-tree to represent the floor plan, which is a hierarchical structure that allows for efficient storage and manipulation of the floor plan data.
-Kang and Kim~\cite{KangShinjin2022Fpof} presents a novel method that analyses mobile app logs and Google server data to identify user behaviour patterns, using a genetic algorithm to generate optimal indoor floor plans that minimise living costs and enhance spatial analysis.
-Zawidzki and Szklarski~\cite{ZawidzkiMachi2020Moot} developed a multi-objective optimisation framework for single-story house floor plans, balancing functionality, sunlight, view, and noise reduction through gradient-based methods and user-defined preferences, demonstrated via a case study.
+Zou et al.~\cite{ZouDexuan2024Amsa} proposed a memory-based simulated annealing algorithm for fixed-outline floor planning with soft blocks, using a memory pool and geometric auxiliary functions to escape local optima and efficiently meet design constraints, showing superior performance on benchmarks. Both Zou~\cite{ZouDexuan2024Amsa} and Singha~\cite{SinghaT.2012OoFu} used B*-tree structures to represent the floor plan, which is a hierarchical structure that allows for efficient storage and manipulation of floor plan data.
+Kang and Kim~\cite{KangShinjin2022Fpof} presented a novel method that analyses mobile app logs and Google server data to identify user behaviour patterns, using a genetic algorithm to generate optimal indoor floor plans that minimise living costs and enhance spatial analysis.
+Zawidzki and Szklarski~\cite{ZawidzkiMachi2020Moot} developed a multi-objective optimisation framework for single-story house floor plans, balancing functionality, sunlight, view, and noise reduction through gradient-based methods and user-defined preferences, as demonstrated in a case study.
 
-Furthermore, the integration of machine learning techniques with evolutionary algorithms has gained attention in recent decades~\cite{HousseinEssamH.2021MAiP}. For example, Wang et al.~\cite{WANG20051329} proposed a hybrid approach that combines a genetic algorithm with a neural network to predict the fitness of candidate solutions. This method significantly reduces the computational cost of evaluating large populations and accelerates the optimisation process.
+Furthermore, the integration of machine learning techniques with evolutionary algorithms has gained attention in recent decades~\cite{HousseinEssamH.2021MAiP}. For example, Wang et al.~\cite{WANG20051329} proposed a hybrid approach that combines a genetic algorithm with a neural network to predict the fitness of candidate solutions. This method significantly reduces the computational cost of evaluating large populations and accelerates the optimisation process. Ploennigs and Berger~\cite{PloennigsJoern2024Acdw} proposed using diffusion-based generative AI to automate architectural floor plan design, improving the validity of generated layouts from 6\% to 90\% and highlighting both its potential and challenges in the design automation process.
 
 Overall, the literature indicates that evolutionary algorithms, particularly when combined with other optimisation techniques and machine learning methods, offer a powerful tool for optimising residential floor plans. These approaches not only improve the efficiency and quality of the designs but also provide flexibility in accommodating various design preferences and constraints.
 
@@ -668,7 +667,7 @@ The PSO-(1+1) EA algorithm attains a fitness value of 16.26 after 30,000 iterati
 \end{table}
 
 \subsection{Comparison by running same amount of time}
-To further evaluate the performance and stability of each algorithm, I conducted five independent runs for each of the three algorithm combinations, with each run limited to a maximum execution time of one hour. For each run, the highest fitness value achieved was recorded. The maximum, average, and standard deviation (std) of the best fitness values were then calculated for each algorithm. The results are summarised in Table~\ref{tab:statistical_comparison}.
+To further evaluate the performance and stability of each algorithm, I conducted five independent runs for each of the three algorithm combinations, with each run limited to a maximum execution time of one hour. For each run, the highest fitness value achieved was recorded. Table~\ref{tab:statistical_comparison} summarises the maximum, average, and standard deviation (std) of the best fitness values for each algorithm.
 
 \begin{table}[h]
     \centering
@@ -678,21 +677,41 @@ To further evaluate the performance and stability of each algorithm, I conducted
         \hline
         \textbf{Method} & \textbf{Max Fitness} & \textbf{Average Fitness} & \textbf{Std} \\
         \hline
-        Dual (1+1) EA   & 16.5113              & 13.2129                  & 5.6406       \\
-        PSO-(1+1) EA    & 19.0984              & 15.4169                  & 6.3322       \\
-        PSO-MCTS        & 1.9400               & 1.9209                   & 0.0112       \\
+        Dual (1+1)EA    & 18.5998              & 17.2614                  & 0.7728       \\
+        PSO-(1+1)EA     & 17.8418              & 14.5881                  & 5.9101       \\
+        PSO-MCTS        & 1.9775               & 1.9530                   & 0.0215       \\
         \hline
     \end{tabularx}
 \end{table}
 
-These results show that both (1+1) EA-based methods can achieve significantly higher fitness values than PSO-MCTS within the same time limit. However, the standard deviations for the (1+1) EA-based methods are also larger, indicating greater variability in their performance across different runs. In contrast, PSO-MCTS is much more stable but consistently achieves lower fitness values. This suggests that while the (1+1) EA-based approaches are more effective at finding high-quality solutions, their results may be less consistent from run to run.
+To visually compare the quality of floor plans generated by the three algorithm combinations, see Figure~\ref{fig:best-snapshots} in Appendix for representative snapshots of the best solutions generated by each method within the same time limit. These snapshots illustrate the differences in room arrangement, space utilisation, and overall layout quality achieved by each approach.
 
-\subsection{Same amount of iterations \& One more bedroom}
-To further evaluate the robustness of three algorithm combinations, I ran each algorithm for up to 1 hour each and recorded the best fitness value achieved.
+\subsection{Same amount of time \& Add one bedroom}
+To further investigate the impact of increased design complexity, I added an extra bedroom (Bedroom2) to the floor plan and repeated the experiments. For each of the three algorithm combinations, I conducted five independent runs, each limited to one hour, and recorded the best fitness value achieved in each run. Table~\ref{tab:statistical_comparison_new} presents the maximum, average, and standard deviation (std) of the best fitness values for each algorithm under this more challenging scenario.
+
+\begin{table}[h]
+    \centering
+    \caption{Statistical Comparison of Algorithm Performance (5 runs, 1 hour per run, updated results)}
+    \label{tab:statistical_comparison_new}
+    \begin{tabularx}{\textwidth}{l | l | l | l}
+        \hline
+        \textbf{Method} & \textbf{Max Fitness} & \textbf{Average Fitness} & \textbf{Std} \\
+        \hline
+        Dual (1+1)EA    & 17.6344              & 13.1540                  & 5.3013       \\
+        PSO-(1+1)EA     & 17.7966              & 5.1424                   & 6.3271       \\
+        PSO-MCTS        & 1.8860               & 1.8544                   & 0.0221       \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+The results indicate that, with the additional bedroom, both (1+1)EA-based methods still outperform PSO-MCTS in terms of maximum and average fitness, but also show greater variability across runs. PSO-MCTS remains the most stable, but its best solutions are consistently lower in quality compared to the other methods. This demonstrates that the (1+1)EA-based approaches are more effective at handling increased design complexity, though their results may fluctuate more between runs.
+
+Figure~\ref{fig:best-snapshots-2bed} in the Appendix presents representative snapshots of the best floor plans generated by each algorithm combination after adding an extra bedroom.
 
 \section{Conclusion}
-In this thesis, I have presented the progress of my research on optimising residential floor plans using evolutionary algorithms. The research focuses on the representation of floor plans, evaluation of solutions, and the application of evolutionary optimisation techniques. The initial plan was to use a combination of PSO and MCTS algorithms, but due to the limitations of the MCTS algorithm in optimising room positions, I switched to a (1+1) EA approach. The optimisation process has shown promising results, with significant improvements in fitness values after 2000 iterations.
-The final results indicate that the dual (1+1) EA algorithm is the most effective strategy for floor plan optimisation, achieving a fitness value of 14.53 in 23 minutes. The research has demonstrated the potential of evolutionary algorithms in generating high-quality residential floor plans that meet various design criteria and constraints.
+This thesis presented a comprehensive study on the optimisation of residential floor plans using evolutionary algorithms. The research addressed key aspects of floor plan design, including solution representation, evaluation criteria, and the application of advanced optimisation techniques. While the initial approach combined PSO and MCTS algorithms, experimental results revealed limitations in the effectiveness of MCTS for optimising room positions. Consequently, the methodology shifted towards a (1+1) Evolutionary Algorithm, which proved to be more effective and easier to implement.
+
+Through systematic experimentation and iterative refinement, the dual (1+1) EA approach emerged as the most robust and efficient strategy, consistently achieving high fitness values within reasonable computational time. The findings demonstrate that evolutionary algorithms, particularly the (1+1) EA, are capable of generating high-quality residential floor plans that satisfy a range of design criteria and constraints. This work highlights the potential of evolutionary optimisation as a valuable tool for automating and improving the architectural design process.
 
 \section{Future Work}
 Future work will focus on further enhancing the optimisation process by exploring additional evolutionary algorithms to improve the quality of the generated floor plans and develop a robust framework for real-world applications.
@@ -708,7 +727,7 @@ Planned improvements include:
 \section{Plagiarism Declaration}
 I hereby declare that this submission is my own work and to the best of my knowledge, it contains no material previously published or written by another person, except where due to acknowledgement is made. Furthermore, I believe that it contains no material which has been accepted for the award of other degree or diploma in any university or other tertiary institutions.
 
-% \newpage
+\newpage
 \bibliographystyle{abbrv}
 \bibliography{MyReferences}
 
@@ -716,6 +735,47 @@ I hereby declare that this submission is my own work and to the best of my knowl
 \section{Appendix}
 \subsection{Code}
 Our code is available on GitHub: \url{https://github.com/ZuxingGit/EvolutionaryOptimisation/blob/main/code/3_optimization/run_pso_mcts.py}
+
+\subsection{Best Floor Plan Snapshots}
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{images/1best_dual_1plus1ea.png}
+        \caption{Dual (1+1) EA}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{images/1best_pso_1plus1ea.png}
+        \caption{PSO--(1+1) EA}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{images/1best_pso_mcts.png}
+        \caption{PSO--MCTS}
+    \end{subfigure}
+    \caption{Best floor plan snapshots generated by each algorithm combination.}
+    \label{fig:best-snapshots}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{images/2bed_best_dual_1plus1ea.png}
+        \caption{Dual (1+1) EA with extra bedroom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{images/2bed_best_pso_1plus1ea.png}
+        \caption{PSO--(1+1) EA with extra bedroom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.8\textwidth}
+        \includegraphics[width=\textwidth]{images/2bed_best_pso_mcts.png}
+        \caption{PSO--MCTS with extra bedroom}
+    \end{subfigure}
+    \caption{Best floor plan snapshots generated by each algorithm combination after adding Bedroom2.}
+    \label{fig:best-snapshots-2bed}
+\end{figure}
 
 \end{document}
 

@@ -25,10 +25,11 @@
 \contentsline {section}{\numberline {5}Experimental Results}{23}{section.5}%
 \contentsline {subsection}{\numberline {5.1}Run same iterations for 3 Algorithm Combinations}{23}{subsection.5.1}%
 \contentsline {subsection}{\numberline {5.2}Comparison by running same amount of time}{24}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Same amount of iterations \& One more bedroom}{25}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.3}Same amount of time \& Add one bedroom}{25}{subsection.5.3}%
 \contentsline {section}{\numberline {6}Conclusion}{25}{section.6}%
-\contentsline {section}{\numberline {7}Future Work}{25}{section.7}%
+\contentsline {section}{\numberline {7}Future Work}{26}{section.7}%
 \contentsline {section}{\numberline {8}Plagiarism Declaration}{26}{section.8}%
-\contentsline {section}{\numberline {9}References}{26}{section.9}%
-\contentsline {section}{\numberline {A}Appendix}{27}{appendix.A}%
-\contentsline {subsection}{\numberline {A.1}Code}{27}{subsection.A.1}%
+\contentsline {section}{\numberline {9}References}{27}{section.9}%
+\contentsline {section}{\numberline {A}Appendix}{28}{appendix.A}%
+\contentsline {subsection}{\numberline {A.1}Code}{28}{subsection.A.1}%
+\contentsline {subsection}{\numberline {A.2}Best Floor Plan Snapshots}{28}{subsection.A.2}%
